@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convite</title>
+<meta name="description" content="Convite digital em formato de envelope de papel — abra, leia e confirme presença.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="google-fonts-link" rel="stylesheet" href="">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ================= ETAPA 1: ENVELOPE ================= -->
+  <section class="etapa envelope-etapa" id="etapa-envelope">
+    <p class="chamada-inicial" id="txt-chamada">VOCÊ ESTÁ CONVIDADO</p>
+
+    <div class="cena-envelope">
+      <div class="envelope" id="envelope">
+
+        <div class="envelope-bolso textura"></div>
+
+        <div class="carta-espiando" id="carta-espiando" tabindex="0" role="button" aria-label="Puxar carta do envelope">
+          <span class="dica-puxar">TOQUE PARA LER</span>
+        </div>
+
+        <div class="envelope-frente">
+          <div class="envelope-endereco">
+            <small>PARA</small>
+            <span id="txt-endereco">Convidado(a) Especial</span>
+          </div>
+        </div>
+
+        <div class="selo-postal" id="selo-postal">
+          <svg viewBox="0 0 24 24"><path d="M12 2 L14 9 L22 9 L15.5 13.5 L18 21 L12 16.5 L6 21 L8.5 13.5 L2 9 L10 9 Z" stroke="currentColor" stroke-width="1"/></svg>
+        </div>
+
+        <div class="envelope-aba textura" id="envelope-aba"></div>
+
+        <button class="selo-cera" id="btn-selo" aria-label="Abrir convite" type="button">
+          <span id="selo-iniciais">S</span>
+        </button>
+
+      </div>
+    </div>
+
+    <p class="instrucao-selo" id="instrucao-selo">Toque no selo para abrir o convite</p>
+  </section>
+
+  <!-- ================= ETAPA 2: CARTA / CONVITE ================= -->
+  <section class="etapa carta-etapa oculto" id="etapa-carta">
+    <div class="carta-papel textura">
+      <div class="carta-borda"></div>
+
+      <div class="friso tl"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
+      <div class="friso tr"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
+      <div class="friso bl"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
+      <div class="friso br"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
+
+      <div class="carta-topo">
+        <div class="carta-monograma" id="carta-monograma">S</div>
+        <p class="carta-anfitriao" id="txt-anfitriao">ANFITRIÃO</p>
+        <p class="carta-saudacao" id="txt-saudacao">Com muita alegria</p>
+        <h1 class="carta-titulo" id="txt-titulo">Título do Evento</h1>
+        <p class="carta-subtitulo" id="txt-subtitulo">SUBTÍTULO</p>
+      </div>
+
+      <div class="divisor"></div>
+
+      <p class="carta-mensagem" id="txt-mensagem">Mensagem do convite.</p>
+
+      <div id="midia-container"></div>
+
+      <div id="galeria-container"></div>
+
+      <div class="detalhes-grade">
+        <div class="detalhe-item">
+          <div class="detalhe-icone">📅</div>
+          <div class="detalhe-texto">
+            <div class="rotulo">DATA E HORA</div>
+            <div class="valor" id="txt-data">--</div>
+            <div class="sub" id="txt-hora">--</div>
+          </div>
+        </div>
+        <div class="detalhe-item">
+          <div class="detalhe-icone">📍</div>
+          <div class="detalhe-texto">
+            <div class="rotulo">LOCAL</div>
+            <div class="valor" id="txt-local-nome">--</div>
+            <div class="sub" id="txt-local-endereco">--</div>
+          </div>
+        </div>
+        <div class="detalhe-item oculto" id="bloco-trajes">
+          <div class="detalhe-icone">👔</div>
+          <div class="detalhe-texto">
+            <div class="rotulo">TRAJE</div>
+            <div class="valor" id="txt-traje">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contagem-regressiva oculto" id="contagem-regressiva"></div>
+
+      <div class="aviso-extra oculto" id="aviso-extra">
+        <strong id="aviso-extra-titulo">Observação</strong>
+        <span id="aviso-extra-texto"></span>
+      </div>
+
+      <div class="botoes-carta">
+        <button class="btn btn-primario btn-bloco" id="btn-ir-formulario" type="button">CONFIRMAR PRESENÇA</button>
+        <button class="btn btn-secundario btn-bloco" id="btn-voltar-envelope" type="button">GUARDAR NO ENVELOPE</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ETAPA 3: FORMULÁRIO ================= -->
+  <section class="etapa oculto" id="etapa-form">
+    <div class="cabecalho-etapa">
+      <h2 id="txt-form-titulo">Confirme sua presença</h2>
+      <p id="txt-form-subtitulo">Preencha os dados abaixo</p>
+    </div>
+
+    <form class="form-papel textura" id="form-confirmar">
+      <div class="campo">
+        <label for="campo-nome">NOME COMPLETO</label>
+        <input type="text" id="campo-nome" name="nome" placeholder="Seu nome" required autocomplete="name">
+      </div>
+
+      <div class="linha-form" id="linha-email-tel">
+        <div class="campo" id="grupo-email">
+          <label for="campo-email">E-MAIL</label>
+          <input type="email" id="campo-email" name="email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+        <div class="campo" id="grupo-telefone">
+          <label for="campo-telefone">TELEFONE</label>
+          <input type="tel" id="campo-telefone" name="telefone" placeholder="(11) 99999-9999" autocomplete="tel">
+        </div>
+      </div>
+
+      <div class="linha-form" id="linha-empresa-acomp">
+        <div class="campo" id="grupo-empresa">
+          <label for="campo-empresa">EMPRESA</label>
+          <input type="text" id="campo-empresa" name="empresa" placeholder="Sua empresa">
+        </div>
+        <div class="campo" id="grupo-acompanhantes">
+          <label for="campo-acompanhantes">ACOMPANHANTES</label>
+          <select id="campo-acompanhantes" name="acompanhantes">
+            <option value="">Selecione</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo" id="grupo-restricoes">
+        <label for="campo-restricoes">RESTRIÇÕES ALIMENTARES</label>
+        <input type="text" id="campo-restricoes" name="restricoes" placeholder="Ex: Vegetariano, sem glúten...">
+      </div>
+
+      <div class="campo" id="grupo-extra">
+        <label for="campo-extra" id="label-extra">Pergunta extra</label>
+        <input type="text" id="campo-extra" name="extra" placeholder="">
+      </div>
+
+      <div class="acoes-form">
+        <button type="submit" class="btn btn-primario btn-bloco" id="btn-enviar-form">CONFIRMAR PRESENÇA</button>
+        <button type="button" class="btn btn-secundario btn-bloco" id="btn-voltar-carta">VOLTAR</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= ETAPA 4: CONFIRMAÇÃO ================= -->
+  <section class="etapa confirmacao-etapa oculto" id="etapa-confirmacao">
+    <div class="selo-sucesso">✓</div>
+    <div class="cabecalho-etapa">
+      <h2>PRESENÇA CONFIRMADA!</h2>
+      <p id="txt-obrigado">Obrigado por confirmar</p>
+    </div>
+
+    <div class="card-confirmacao textura">
+      <div class="resumo-item">
+        <div class="rotulo">NOME</div>
+        <div class="valor" id="resumo-nome">-</div>
+      </div>
+      <div class="resumo-item" id="resumo-email-wrap">
+        <div class="rotulo">E-MAIL</div>
+        <div class="valor" id="resumo-email">-</div>
+      </div>
+      <div class="resumo-item" id="resumo-acompanhantes-wrap">
+        <div class="rotulo">ACOMPANHANTES</div>
+        <div class="valor" id="resumo-acompanhantes">-</div>
+      </div>
+
+      <div class="links-rapidos">
+        <a href="#" class="link-card" id="link-mapa" target="_blank" rel="noopener">
+          <span class="ic">📍</span>LOCAL DO EVENTO
+        </a>
+        <a href="#" class="link-card" id="link-trajes" target="_blank" rel="noopener">
+          <span class="ic">👔</span>DRESS CODE
+        </a>
+        <button class="link-card" id="link-calendario" type="button">
+          <span class="ic">🗓️</span>ADICIONAR AO CALENDÁRIO
+        </button>
+        <button class="link-card" id="link-compartilhar" type="button">
+          <span class="ic">🔗</span>COMPARTILHAR CONVITE
+        </button>
+      </div>
+
+      <p class="status-envio" id="status-envio"></p>
+    </div>
+
+    <div class="rodape-contato" id="rodape-contato"></div>
+
+    <button class="btn btn-ouro" id="btn-nova-confirmacao" type="button" style="margin-top:20px;">NOVA CONFIRMAÇÃO</button>
+  </section>
+
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
