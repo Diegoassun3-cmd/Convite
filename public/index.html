@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Convite</title>
 <meta name="description" content="Convite digital em formato de envelope de papel — abra, leia e confirme presença.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link id="google-fonts-link" rel="stylesheet" href="">
-<link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<div class="fundo-padrao"></div>
+<div class="fundo-tela-cheia" id="fundo-tela-cheia"></div>
 
 <div class="app" id="app">
 
@@ -53,15 +54,10 @@
   <!-- ================= ETAPA 2: CARTA / CONVITE ================= -->
   <section class="etapa carta-etapa oculto" id="etapa-carta">
     <div class="carta-papel textura">
-      <div class="carta-borda"></div>
-
-      <div class="friso tl"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
-      <div class="friso tr"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
-      <div class="friso bl"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
-      <div class="friso br"><svg viewBox="0 0 60 60"><path d="M2 40 Q2 2 40 2" stroke-width="1.5"/><circle cx="2" cy="40" r="2" fill="currentColor"/></svg></div>
+      <div class="carta-faixa"></div>
 
       <div class="carta-topo">
-        <div class="carta-monograma" id="carta-monograma">S</div>
+        <div class="carta-logo" id="carta-logo">S</div>
         <p class="carta-anfitriao" id="txt-anfitriao">ANFITRIÃO</p>
         <p class="carta-saudacao" id="txt-saudacao">Com muita alegria</p>
         <h1 class="carta-titulo" id="txt-titulo">Título do Evento</h1>
@@ -217,7 +213,6 @@
 
 </div>
 
-<script src="config.js"></script>
-<script src="app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

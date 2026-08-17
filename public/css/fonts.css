@@ -1,0 +1,17 @@
+/* Fontes da marca — carregadas localmente (sem depender de CDN externo). */
+
+@font-face {
+  font-family: 'Nyata';
+  src: url('/fonts/NyataFTR-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
