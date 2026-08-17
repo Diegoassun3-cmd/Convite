@@ -150,7 +150,7 @@
         img.addEventListener('error', function onErr() {
           img.removeEventListener('error', onErr);
           const moldura = img.closest('.midia-moldura');
-          if (moldura) moldura.innerHTML = '<div class="midia-placeholder">📷<span>Envie a foto de capa pelo painel administrativo</span></div>';
+          if (moldura) moldura.innerHTML = '<div class="midia-placeholder"><span>Envie a foto de capa pelo painel administrativo</span></div>';
         });
       }
     } else if (m.tipo === 'video' && m.videoUrl) {
@@ -161,7 +161,7 @@
             ${m.videoPoster ? `poster="${escaparHtml(m.videoPoster)}"` : ''}>
             <source src="${escaparHtml(m.videoUrl)}" type="video/mp4">
           </video>
-          ${m.videoBotaoSom ? '<button class="midia-som-btn" id="btn-midia-som" type="button">🔇 Ativar som</button>' : ''}
+          ${m.videoBotaoSom ? '<button class="midia-som-btn" id="btn-midia-som" type="button">ATIVAR SOM</button>' : ''}
         </div>
         ${m.legenda ? `<p class="midia-legenda">${escaparHtml(m.legenda)}</p>` : ''}`;
 
@@ -171,14 +171,14 @@
       if (btnSom && video) {
         btnSom.addEventListener('click', () => {
           video.muted = !video.muted;
-          btnSom.textContent = video.muted ? '🔇 Ativar som' : '🔊 Silenciar';
+          btnSom.textContent = video.muted ? 'ATIVAR SOM' : 'SILENCIAR';
         });
       }
       if (video) {
         video.addEventListener('error', function onErr() {
           video.removeEventListener('error', onErr);
           const moldura = video.closest('.midia-moldura');
-          if (moldura) moldura.innerHTML = '<div class="midia-placeholder">🎬<span>Envie o vídeo de capa pelo painel administrativo</span></div>';
+          if (moldura) moldura.innerHTML = '<div class="midia-placeholder"><span>Envie o vídeo de capa pelo painel administrativo</span></div>';
         });
       }
     } else {
@@ -212,7 +212,7 @@
     function atualizar() {
       const diff = alvo - Date.now();
       if (diff <= 0) {
-        container.innerHTML = '<div class="contagem-item"><span class="n">🎉</span><span class="l">É HOJE!</span></div>';
+        container.innerHTML = '<div class="contagem-item contagem-hoje"><span class="n">É HOJE</span></div>';
         clearInterval(timerContagem);
         return;
       }

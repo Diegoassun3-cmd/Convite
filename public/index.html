@@ -24,19 +24,15 @@
 
         <div class="envelope-bolso textura"></div>
 
-        <div class="carta-espiando" id="carta-espiando" tabindex="0" role="button" aria-label="Puxar carta do envelope">
+        <div class="carta-espiando textura" id="carta-espiando" tabindex="0" role="button" aria-label="Puxar carta do envelope">
           <span class="dica-puxar">TOQUE PARA LER</span>
         </div>
 
-        <div class="envelope-frente">
+        <div class="envelope-frente textura">
           <div class="envelope-endereco">
             <small>PARA</small>
             <span id="txt-endereco">Convidado(a) Especial</span>
           </div>
-        </div>
-
-        <div class="selo-postal" id="selo-postal">
-          <svg viewBox="0 0 24 24"><path d="M12 2 L14 9 L22 9 L15.5 13.5 L18 21 L12 16.5 L6 21 L8.5 13.5 L2 9 L10 9 Z" stroke="currentColor" stroke-width="1"/></svg>
         </div>
 
         <div class="envelope-aba textura" id="envelope-aba"></div>
@@ -74,27 +70,18 @@
 
       <div class="detalhes-grade">
         <div class="detalhe-item">
-          <div class="detalhe-icone">📅</div>
-          <div class="detalhe-texto">
-            <div class="rotulo">DATA E HORA</div>
-            <div class="valor" id="txt-data">--</div>
-            <div class="sub" id="txt-hora">--</div>
-          </div>
+          <div class="rotulo">DATA E HORA</div>
+          <div class="valor" id="txt-data">--</div>
+          <div class="sub" id="txt-hora">--</div>
         </div>
         <div class="detalhe-item">
-          <div class="detalhe-icone">📍</div>
-          <div class="detalhe-texto">
-            <div class="rotulo">LOCAL</div>
-            <div class="valor" id="txt-local-nome">--</div>
-            <div class="sub" id="txt-local-endereco">--</div>
-          </div>
+          <div class="rotulo">LOCAL</div>
+          <div class="valor" id="txt-local-nome">--</div>
+          <div class="sub" id="txt-local-endereco">--</div>
         </div>
         <div class="detalhe-item oculto" id="bloco-trajes">
-          <div class="detalhe-icone">👔</div>
-          <div class="detalhe-texto">
-            <div class="rotulo">TRAJE</div>
-            <div class="valor" id="txt-traje">--</div>
-          </div>
+          <div class="rotulo">TRAJE</div>
+          <div class="valor" id="txt-traje">--</div>
         </div>
       </div>
 
@@ -168,7 +155,9 @@
 
   <!-- ================= ETAPA 4: CONFIRMAÇÃO ================= -->
   <section class="etapa confirmacao-etapa oculto" id="etapa-confirmacao">
-    <div class="selo-sucesso">✓</div>
+    <div class="selo-sucesso">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M5 12.5 L10 17.5 L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
     <div class="cabecalho-etapa">
       <h2>PRESENÇA CONFIRMADA!</h2>
       <p id="txt-obrigado">Obrigado por confirmar</p>
@@ -189,18 +178,10 @@
       </div>
 
       <div class="links-rapidos">
-        <a href="#" class="link-card" id="link-mapa" target="_blank" rel="noopener">
-          <span class="ic">📍</span>LOCAL DO EVENTO
-        </a>
-        <a href="#" class="link-card" id="link-trajes" target="_blank" rel="noopener">
-          <span class="ic">👔</span>DRESS CODE
-        </a>
-        <button class="link-card" id="link-calendario" type="button">
-          <span class="ic">🗓️</span>ADICIONAR AO CALENDÁRIO
-        </button>
-        <button class="link-card" id="link-compartilhar" type="button">
-          <span class="ic">🔗</span>COMPARTILHAR CONVITE
-        </button>
+        <a href="#" class="link-card" id="link-mapa" target="_blank" rel="noopener">LOCAL DO EVENTO</a>
+        <a href="#" class="link-card" id="link-trajes" target="_blank" rel="noopener">DRESS CODE</a>
+        <button class="link-card" id="link-calendario" type="button">ADICIONAR AO CALENDÁRIO</button>
+        <button class="link-card" id="link-compartilhar" type="button">COMPARTILHAR CONVITE</button>
       </div>
 
       <p class="status-envio" id="status-envio"></p>

@@ -183,7 +183,7 @@
     const preview = $(info.preview);
     const nome = $(info.nome);
     if (!url) {
-      preview.innerHTML = info.tipo === 'video' ? '🎬' : '🖼️';
+      preview.innerHTML = '';
       if (nome) nome.textContent = 'Nenhum arquivo enviado';
       return;
     }
@@ -289,7 +289,7 @@
   function renderizarGaleria() {
     const grade = $('galeria-grade');
     grade.innerHTML = galeria
-      .map((g, i) => `<div class="galeria-item"><img src="${g.url}" alt=""><button type="button" data-remover-galeria="${i}">✕</button></div>`)
+      .map((g, i) => `<div class="galeria-item"><img src="${g.url}" alt=""><button type="button" data-remover-galeria="${i}">X</button></div>`)
       .join('');
     $$('[data-remover-galeria]', grade).forEach((btn) => {
       btn.addEventListener('click', async () => {
