@@ -10,7 +10,7 @@
 :root {
   --papel: #F2EDE6;
   --papel-sombra: #e4dccb;
-  --envelope: #eee6d6;
+  --envelope: #F2EDE6;
   --envelope-forro: #004BA3;
   --tinta: #1c2733;
   --tinta-suave: #5c6672;
@@ -126,8 +126,8 @@ html { overflow-x: hidden; }
   perspective: 1400px;
   margin: 0 auto 30px;
   width: 100%;
-  max-width: 340px;
-  aspect-ratio: 3 / 2;
+  max-width: 320px;
+  aspect-ratio: 10 / 9;
   position: relative;
 }
 
@@ -189,15 +189,15 @@ html { overflow-x: hidden; }
   overflow: hidden;
 }
 
-/* costura da dobra inferior do envelope (aba de trás, sempre colada) —
-   dá o efeito de envelope de papel construído de verdade, não só uma caixa */
+/* costura em diamante do envelope — as abas de trás (esquerda, direita e
+   inferior) já coladas, encontrando-se num ponto central, como um envelope
+   de papel construído de verdade (não só uma caixa lisa) */
 .envelope-frente::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(180deg, transparent 66%, rgba(0, 40, 100, 0.05) 74%, transparent 84%),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'><path d='M0,200 L150,146 L300,200' stroke='rgba(0,45,110,0.16)' stroke-width='1.6' fill='none'/></svg>");
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon points='0,50 0,100 50,74' fill='rgba(0,20,50,0.045)'/><polygon points='100,50 100,100 50,74' fill='rgba(0,20,50,0.02)'/><polygon points='0,100 100,100 50,74' fill='rgba(255,255,255,0.22)'/><g stroke='rgba(0,40,95,0.16)' stroke-width='0.6' fill='none'><path d='M0,50 L50,74 L100,50'/><path d='M0,100 L50,74 L100,100'/></g></svg>");
   background-size: 100% 100%;
   pointer-events: none;
 }
@@ -210,7 +210,7 @@ html { overflow-x: hidden; }
 .envelope-endereco span { font-size: 24px; }
 
 .envelope-aba {
-  position: absolute; top: 0; left: 0; width: 100%; height: 62%;
+  position: absolute; top: 0; left: 0; width: 100%; height: 50%;
   background: linear-gradient(160deg, var(--envelope) 0%, var(--papel-sombra) 55%, var(--envelope) 100%);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   transform-origin: top center;
@@ -232,7 +232,7 @@ html { overflow-x: hidden; }
 .envelope.aberto .envelope-aba { transform: rotateX(-178deg); z-index: 1; }
 
 .selo-cera {
-  position: absolute; top: 55%; left: 50%; width: 50px; height: 50px;
+  position: absolute; top: 46%; left: 50%; width: 50px; height: 50px;
   margin: -25px 0 0 -25px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -262,12 +262,13 @@ html { overflow-x: hidden; }
 .carta-etapa { display: flex; justify-content: center; }
 
 .carta-papel {
+  --carta-pad-x: 28px;
   position: relative;
   width: 100%;
   background: var(--papel);
   border-radius: var(--raio-card);
   box-shadow: var(--sombra-forte);
-  padding: 38px 28px 30px;
+  padding: 38px var(--carta-pad-x) 30px;
   overflow: hidden;
 }
 
@@ -297,9 +298,12 @@ html { overflow-x: hidden; }
 
 .carta-mensagem { font-size: 16px; line-height: 1.65; color: var(--tinta); text-align: center; margin-bottom: 22px; position: relative; z-index: 1; }
 
+/* a foto/vídeo ocupa a largura inteira do papel (sangria até a borda do
+   cartão), como se fosse uma parte impressa da própria folha */
 .midia-moldura {
-  position: relative; margin: 4px auto 22px;
-  border-radius: 16px; overflow: hidden;
+  position: relative;
+  margin: 4px calc(-1 * var(--carta-pad-x)) 22px;
+  overflow: hidden;
   box-shadow: var(--sombra-suave);
   max-height: 320px;
 }
@@ -426,7 +430,8 @@ html { overflow-x: hidden; }
   .links-rapidos { grid-template-columns: 1fr; }
   .carta-titulo { font-size: 30px; }
   .cabecalho-etapa h2 { font-size: 25px; }
-  .carta-papel, .form-papel, .card-confirmacao { padding: 28px 20px; }
+  .carta-papel { --carta-pad-x: 20px; padding-left: var(--carta-pad-x); padding-right: var(--carta-pad-x); padding-top: 28px; }
+  .form-papel, .card-confirmacao { padding: 28px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

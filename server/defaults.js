@@ -37,7 +37,7 @@ module.exports = {
   visual: {
     corPapel: "#F2EDE6",
     corPapelSombra: "#e4dccb",
-    corEnvelope: "#eee6d6",
+    corEnvelope: "#F2EDE6",
     corEnvelopeForro: "#004BA3",
     corTinta: "#1c2733",
     corDestaque: "#004BA3",
