@@ -1,13 +1,4 @@
 node_modules/
-
-# Estado de runtime — gerado automaticamente no primeiro boot / pelo painel
-# administrativo. Não deve ser versionado (contém a senha do admin e as
-# confirmações reais dos convidados).
-data/*.json
-
-# Arquivos enviados pelo painel administrativo (fotos, vídeos, logo).
-uploads/**/*
-!uploads/**/.gitkeep
-
-.env
+.wrangler/
+.dev.vars
 *.log

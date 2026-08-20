@@ -1,8 +1,8 @@
 /**
  * Configuração padrão do convite — usada apenas na primeira execução, para
- * criar data/config.json. Depois disso, tudo é editado pelo painel /admin.
+ * semear a linha em D1. Depois disso, tudo é editado pelo painel /admin.
  */
-module.exports = {
+export default {
   evento: {
     chamada: "Você está convidado",
     anfitriao: "Solua Imóveis",

@@ -1,112 +1,93 @@
-# Convite Solua — Envelope de Papel Configurável
+# Convite Solua — Envelope de Papel Configurável (Cloudflare Worker)
 
-Um convite digital que imita um convite de papel de verdade: envelope com
-textura de papel e selo de cera, carta que desliza para fora, fundo em tela
-cheia (foto ou vídeo) e formulário de confirmação de presença — com um
-**painel administrativo protegido por login** para configurar absolutamente
-tudo, sem mexer em código.
+Convite digital em formato de envelope de papel (textura real, selo de cera,
+carta que desliza para fora) com painel administrativo protegido por login
+em `/admin` — configura tudo (textos, cores, fotos, vídeos, formulário) e
+lista as confirmações recebidas.
 
-Identidade visual: papel `#F2EDE6`, azul `#004BA3`, fontes **Nyata** (títulos)
-e **Satoshi** (texto/interface), botões arredondados.
+Roda inteiramente na Cloudflare: **Workers** (backend), **D1** (banco de
+dados), **R2** (fotos/vídeos enviados) e **KV** (limite de tentativas de
+login/RSVP). Sem servidor Node para manter no ar.
 
-## Por que agora é uma aplicação Node (não mais só HTML estático)
+## Recursos já provisionados nesta conta
 
-O painel `/admin` precisa de um lugar para guardar com segurança a senha e as
-configurações, de forma que **toda alteração feita no painel apareça
-imediatamente para todos os convidados** — isso exige um pequeno servidor.
-A aplicação é em Node.js + Express, bem enxuta, sem banco de dados externo
-(guarda tudo em arquivos JSON dentro de `data/`).
+| Recurso | Nome | Uso |
+|---|---|---|
+| D1 | `convite-solua-db` | configuração do convite, login do admin, confirmações |
+| R2 | `convite-solua-uploads` | logo, fotos, vídeos enviados pelo painel |
+| KV | `convite-solua-rate-limit` | limite de tentativas de login e envio de RSVP |
 
-## Como rodar localmente
+Os bindings já estão em `wrangler.toml`. O schema (`migrations/0001_init.sql`)
+já foi aplicado no banco remoto.
+
+## Publicar (falta só isso)
 
 ```bash
 npm install
-npm start
+
+# defina o segredo de sessão do admin (gera uma string aleatória e cola
+# quando o wrangler pedir):
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+npx wrangler secret put SESSION_SECRET
+
+npx wrangler deploy
 ```
 
-- Convite: http://localhost:3000
-- Painel administrativo: http://localhost:3000/admin
+Isso publica em `https://convite-solua.<seu-subdomínio>.workers.dev` (ou no
+domínio próprio, se configurar uma rota em `wrangler.toml` /
+Cloudflare Dashboard → Workers Routes).
 
-Na primeira execução, o servidor cria automaticamente um usuário
-administrador e imprime a senha inicial no terminal:
+Depois de publicado, acesse `/admin` — usuário `admin`, senha inicial
+`solua14anos`. Troque-a assim que possível em Segurança.
 
-```
-usuário: admin
-senha:   solua14anos
-```
+## Desenvolvimento local
 
-**Troque essa senha assim que possível** em `/admin` → aba **Segurança**
-(ou pelo terminal, a qualquer momento: `npm run set-password -- "novaSenha"`).
-
-## O que dá para configurar pelo painel (sem tocar em código)
-
-- **Evento**: textos, data/hora real (para contagem regressiva e calendário),
-  data por extenso, local, link do mapa, dress code, prazo de confirmação,
-  um aviso extra opcional.
-- **Marca e logo**: upload do logo (usado no envelope, na carta e no painel)
-  ou monograma com iniciais quando não há logo.
-- **Aparência**: todas as cores (papel, destaque, tinta, envelope, forro,
-  fundo), textura de papel on/off, botões arredondados on/off, selo de cera
-  (cor, iniciais, ativo/inativo).
-- **Mídia do cartão**: foto **ou vídeo** dentro da moldura do convite, com
-  poster, autoplay/loop/mudo, botão de som, legenda, e uma mini galeria de
-  fotos extras.
-- **Fundo em tela cheia**: uma foto **ou vídeo** que cobre a tela toda por
-  trás da carta a partir do momento em que o convite é aberto, com controle
-  de escurecimento para manter a leitura.
-- **Formulário (RSVP)**: ativar/desativar e tornar obrigatório cada campo
-  (e-mail, telefone, empresa, acompanhantes com limite configurável,
-  restrições alimentares, uma pergunta extra livre).
-- **Personalização por convidado**: links individuais como
-  `seusite.com/?para=Maria` — o nome aparece endereçado no envelope e já
-  preenchido no formulário.
-- **Confirmações**: lista de quem confirmou presença, direto no painel, com
-  exportação em CSV.
-- **Integrações**: webhook opcional (além de salvar no painel, também envia
-  cada confirmação para uma planilha via Google Apps Script, Zapier, n8n,
-  etc.), WhatsApp/Instagram/site exibidos na tela de confirmação.
-- **Recursos**: contagem regressiva, botão "adicionar ao calendário" (gera
-  `.ics`), compartilhar link, confete ao confirmar, som sutil ao abrir o
-  envelope.
-
-## Publicando em produção
-
-Essa aplicação precisa de um servidor Node rodando continuamente (GitHub
-Pages **não funciona mais**, pois não roda backend). Opções simples e
-gratuitas/baratas: [Render](https://render.com), [Railway](https://railway.app),
-[Fly.io](https://fly.io), ou qualquer VPS.
-
-1. Copie `.env.example` para `.env` e defina um `SESSION_SECRET` forte:
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   ```
-2. Configure o serviço para rodar `npm install && npm start`.
-3. **Garanta que as pastas `data/` e `uploads/` sejam persistentes** (disco
-   permanente / volume) — é lá que ficam a senha do admin, as configurações
-   e as fotos/vídeos enviados. Se o serviço usa filesystem efêmero (reinicia
-   e apaga tudo a cada deploy), procure a opção de "persistent disk" do
-   provedor e aponte para essas duas pastas.
-4. Acesse `/admin`, troque a senha inicial e configure o convite.
-
-## Estrutura dos arquivos
-
-```
-server.js            → servidor Express (rotas públicas e do painel)
-server/              → auth, config, upload e RSVPs (armazenamento em JSON)
-data/                → estado gerado em runtime (senha, config, confirmações) — não versionado
-uploads/              → fotos/vídeos enviados pelo painel — não versionado
-public/
-  index.html           → convite (envelope → carta → formulário → confirmação)
-  admin.html           → painel administrativo
-  css/                 → estilos (fonts.css, style.css, admin.css)
-  js/                  → app.js (convite) e admin.js (painel)
-  fonts/               → Nyata e Satoshi (arquivos da marca)
+```bash
+cp .dev.vars.example .dev.vars   # edite o SESSION_SECRET
+npx wrangler d1 execute convite-solua-db --local --file=migrations/0001_init.sql
+npm run dev
 ```
 
-## Recebendo as confirmações
+Abre em `http://localhost:8787` (convite) e `/admin` (painel). O `--local`
+usa um banco/bucket simulados na sua máquina, sem tocar nos dados reais.
 
-Toda confirmação já fica salva automaticamente e aparece na aba
-**Confirmações** do painel (com exportação em CSV). Se quiser também
-replicar em uma planilha do Google em tempo real, ative o **webhook** na
-aba **Integrações** apontando para um Google Apps Script publicado como
-app da Web.
+## Se esquecer a senha do admin
+
+```bash
+npm run gerar-hash-senha -- "novaSenhaForte123"
+```
+
+O comando imprime um `wrangler d1 execute ... --remote` pronto para colar —
+redefine a senha direto no banco, sem precisar estar logado.
+
+## O que dá para configurar pelo painel `/admin`
+
+- **Evento**: textos, data/hora real, local, link do mapa, dress code, prazo.
+- **Marca e logo**: upload do logo (envelope, carta e painel) ou monograma.
+- **Aparência**: cores, textura de papel, botões arredondados, selo de cera.
+- **Mídia do cartão**: foto **ou vídeo** dentro da carta, com legenda, poster,
+  autoplay/loop/mudo, e uma mini galeria.
+- **Fundo em tela cheia**: foto **ou vídeo** cobrindo a tela toda a partir da
+  abertura do convite.
+- **Formulário (RSVP)**: ativa/obriga cada campo, limite de acompanhantes,
+  pergunta extra livre.
+- **Confirmações**: lista de quem confirmou, com exportação em CSV.
+- **Integrações**: webhook opcional (replica cada confirmação numa planilha
+  via Google Apps Script, Zapier, n8n, etc.), WhatsApp/Instagram/site.
+
+## Estrutura
+
+```
+wrangler.toml         → bindings (D1, R2, KV) e onde os assets estáticos vivem
+migrations/            → schema do D1
+src/
+  index.js              → rotas (Hono) — config, RSVP, login, uploads
+  config-store.js        → leitura/escrita da config no D1
+  auth-store.js           → login e troca de senha (PBKDF2, sem dependências)
+  rsvp-store.js            → confirmações no D1
+  upload.js                 → validação e gravação no R2
+  rate-limit.js              → limite de tentativas via KV
+  crypto.js                   → hash de senha e cookie de sessão assinado
+public/                → convite + painel (HTML/CSS/JS estáticos, servidos direto)
+scripts/gerar-hash-senha.mjs → utilitário pra redefinir a senha via terminal
+```
