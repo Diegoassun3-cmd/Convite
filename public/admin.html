@@ -10,49 +10,23 @@
 </head>
 <body>
 
-<!-- ======================= TELA DE LOGIN ======================= -->
-<div class="tela-login" id="tela-login">
-  <div class="login-card">
-    <div class="login-logo" id="login-logo">S</div>
-    <h1>Painel do Convite</h1>
-    <p class="sub">Entre para gerenciar textos, mídia e confirmações</p>
-
-    <div class="erro-login oculto" id="login-erro"></div>
-
-    <form id="form-login">
-      <div class="campo">
-        <label for="login-usuario">USUÁRIO</label>
-        <input type="text" id="login-usuario" name="usuario" autocomplete="username" required>
-      </div>
-      <div class="campo">
-        <label for="login-senha">SENHA</label>
-        <input type="password" id="login-senha" name="senha" autocomplete="current-password" required>
-      </div>
-      <button type="submit" class="btn btn-primario btn-bloco" id="btn-login">ENTRAR</button>
-    </form>
-  </div>
-</div>
-
-<!-- ======================= DASHBOARD ======================= -->
-<div class="oculto" id="tela-dashboard">
+<!-- ======================= DASHBOARD (sem login) ======================= -->
+<div id="tela-dashboard">
 
   <div class="topbar">
     <div class="topbar-marca">
       <div class="logo" id="topo-logo">S</div>
       <div>
         <strong>Painel do Convite</strong>
-        <span id="topo-usuario">admin</span>
       </div>
     </div>
     <div class="topbar-acoes">
       <a href="/" target="_blank" class="btn btn-fantasma btn-pequeno">VER CONVITE</a>
-      <button class="btn btn-fantasma btn-pequeno" id="btn-logout">SAIR</button>
     </div>
   </div>
 
-  <div class="alerta oculto" id="alerta-senha-padrao">
-    <span>Você ainda está usando a senha inicial. Troque agora por segurança.</span>
-    <button id="btn-ir-seguranca">Trocar senha</button>
+  <div class="alerta">
+    <span>Este painel não pede mais login. Qualquer pessoa com este link (/admin) pode editar o convite e ver as confirmações — não compartilhe.</span>
   </div>
 
   <div class="layout">
@@ -65,7 +39,6 @@
       <button data-aba="formulario">Formulário</button>
       <button data-aba="confirmacoes">Confirmações</button>
       <button data-aba="envio">Integrações</button>
-      <button data-aba="seguranca">Segurança</button>
     </nav>
 
     <div class="conteudo">
@@ -390,22 +363,6 @@
             <div class="campo"><label>Instagram</label><input type="text" data-path="contato.instagram" placeholder="@usuario"></div>
             <div class="campo"><label>Site</label><input type="text" data-path="contato.site" placeholder="https://..."></div>
           </div>
-        </div>
-      </section>
-
-      <!-- ---------------- SEGURANÇA ---------------- -->
-      <section class="painel" data-painel="seguranca">
-        <div class="secao" style="max-width:420px;">
-          <h2>Trocar senha</h2>
-          <p class="descricao">Usuário atual: <strong id="seguranca-usuario">admin</strong></p>
-          <div class="erro-login oculto" id="senha-erro"></div>
-          <div class="erro-login oculto" id="senha-sucesso" style="background:#e8f7ee;color:#1a8a4c;"></div>
-          <form id="form-senha">
-            <div class="campo"><label>Senha atual</label><input type="password" id="senha-atual" required></div>
-            <div class="campo"><label>Nova senha (mínimo 8 caracteres)</label><input type="password" id="senha-nova" minlength="8" required></div>
-            <div class="campo"><label>Confirmar nova senha</label><input type="password" id="senha-confirmar" minlength="8" required></div>
-            <button type="submit" class="btn btn-primario btn-bloco">SALVAR NOVA SENHA</button>
-          </form>
         </div>
       </section>
 

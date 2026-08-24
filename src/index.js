@@ -1,16 +1,11 @@
 import { Hono } from 'hono';
-import { getCookie, setCookie } from 'hono/cookie';
 
 import { loadConfig, saveConfig, resetConfig } from './config-store.js';
-import { garantirAdmin, validar, trocarSenha } from './auth-store.js';
 import { listar, adicionar, remover, paraCsv } from './rsvp-store.js';
 import { CATEGORIAS, salvarUpload, lerUpload } from './upload.js';
-import { criarSessaoCookie, lerSessaoCookie } from './crypto.js';
 import { permitir } from './rate-limit.js';
 
 const app = new Hono();
-const NOME_COOKIE = 'convite_sessao';
-const DURACAO_SESSAO_SEG = 12 * 60 * 60; // 12h
 
 // ---------------------------------------------------------------------
 // Cabeçalhos de segurança (equivalente ao helmet no Node)
@@ -69,92 +64,37 @@ app.post('/api/rsvp', async (c) => {
 });
 
 // ---------------------------------------------------------------------
-// Autenticação do painel administrativo
+// API administrativa — sem login (qualquer pessoa com o link /admin acessa)
 // ---------------------------------------------------------------------
-app.post('/api/admin/login', async (c) => {
-  const ok = await permitir(c.env.KV, `login:${ipDoVisitante(c)}`, 10, 900);
-  if (!ok) return c.json({ ok: false, erro: 'Muitas tentativas. Tente novamente mais tarde.' }, 429);
+app.get('/api/admin/config', async (c) => c.json(await loadConfig(c.env.DB)));
 
-  const { usuario, senha } = await c.req.json().catch(() => ({}));
-  if (!(await validar(c.env.DB, usuario, senha))) {
-    return c.json({ ok: false, erro: 'Usuário ou senha incorretos.' }, 401);
-  }
-
-  const registro = await garantirAdmin(c.env.DB);
-  const valor = await criarSessaoCookie(c.env.SESSION_SECRET, { autenticado: true, usuario }, DURACAO_SESSAO_SEG);
-  setCookie(c, NOME_COOKIE, valor, {
-    httpOnly: true,
-    sameSite: 'Lax',
-    secure: true,
-    path: '/',
-    maxAge: DURACAO_SESSAO_SEG,
-  });
-  return c.json({ ok: true, precisaTrocarSenha: !!registro.precisa_trocar_senha });
-});
-
-app.post('/api/admin/logout', (c) => {
-  setCookie(c, NOME_COOKIE, '', { httpOnly: true, sameSite: 'Lax', secure: true, path: '/', maxAge: 0 });
-  return c.json({ ok: true });
-});
-
-async function sessaoAtual(c) {
-  const valor = getCookie(c, NOME_COOKIE);
-  return lerSessaoCookie(c.env.SESSION_SECRET, valor);
-}
-
-app.get('/api/admin/sessao', async (c) => {
-  const sessao = await sessaoAtual(c);
-  if (!sessao?.autenticado) return c.json({ autenticado: false });
-  const registro = await garantirAdmin(c.env.DB);
-  return c.json({ autenticado: true, usuario: sessao.usuario, precisaTrocarSenha: !!registro.precisa_trocar_senha });
-});
-
-async function exigirLogin(c, next) {
-  const sessao = await sessaoAtual(c);
-  if (!sessao?.autenticado) return c.json({ ok: false, erro: 'Não autenticado.' }, 401);
-  c.set('usuario', sessao.usuario);
-  await next();
-}
-
-// ---------------------------------------------------------------------
-// API administrativa (protegida)
-// ---------------------------------------------------------------------
-app.get('/api/admin/config', exigirLogin, async (c) => c.json(await loadConfig(c.env.DB)));
-
-app.put('/api/admin/config', exigirLogin, async (c) => {
+app.put('/api/admin/config', async (c) => {
   const parcial = await c.req.json().catch(() => ({}));
   const atualizado = await saveConfig(c.env.DB, parcial);
   return c.json({ ok: true, config: atualizado });
 });
 
-app.post('/api/admin/config/resetar', exigirLogin, async (c) => {
+app.post('/api/admin/config/resetar', async (c) => {
   const restaurado = await resetConfig(c.env.DB);
   return c.json({ ok: true, config: restaurado });
 });
 
-app.post('/api/admin/senha', exigirLogin, async (c) => {
-  const { senhaAtual, senhaNova } = await c.req.json().catch(() => ({}));
-  const resultado = await trocarSenha(c.env.DB, c.get('usuario'), senhaAtual, senhaNova);
-  if (!resultado.ok) return c.json(resultado, 400);
-  return c.json({ ok: true });
-});
+app.get('/api/admin/rsvps', async (c) => c.json(await listar(c.env.DB)));
 
-app.get('/api/admin/rsvps', exigirLogin, async (c) => c.json(await listar(c.env.DB)));
-
-app.get('/api/admin/rsvps.csv', exigirLogin, async (c) => {
+app.get('/api/admin/rsvps.csv', async (c) => {
   const csv = await paraCsv(c.env.DB);
   c.header('Content-Type', 'text/csv; charset=utf-8');
   c.header('Content-Disposition', 'attachment; filename="confirmacoes.csv"');
   return c.body('﻿' + csv);
 });
 
-app.delete('/api/admin/rsvps/:id', exigirLogin, async (c) => {
+app.delete('/api/admin/rsvps/:id', async (c) => {
   await remover(c.env.DB, c.req.param('id'));
   const total = (await listar(c.env.DB)).length;
   return c.json({ ok: true, total });
 });
 
-app.post('/api/admin/upload/:categoria', exigirLogin, async (c) => {
+app.post('/api/admin/upload/:categoria', async (c) => {
   const categoria = c.req.param('categoria');
   if (!CATEGORIAS[categoria]) return c.json({ ok: false, erro: 'Categoria inválida.' }, 400);
 

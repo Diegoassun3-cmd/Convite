@@ -2,13 +2,12 @@
   "name": "convite-solua",
   "version": "2.0.0",
   "private": true,
-  "description": "Convite digital em formato de envelope de papel, com painel administrativo — publicado como Cloudflare Worker (D1 + R2 + KV).",
+  "description": "Convite digital configurável (capa em vídeo, detalhes e formulário), com painel administrativo — publicado como Cloudflare Worker (D1 + KV).",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "db:migrar": "wrangler d1 execute convite-solua-db --remote --file=migrations/0001_init.sql",
-    "gerar-hash-senha": "node scripts/gerar-hash-senha.mjs"
+    "db:migrar": "wrangler d1 execute convite-solua-db --remote --file=migrations/0001_init.sql"
   },
   "dependencies": {
     "hono": "^4.6.9"

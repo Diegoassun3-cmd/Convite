@@ -57,54 +57,6 @@
   }
 
   // ------------------------------------------------------------------
-  // login / sessão
-  // ------------------------------------------------------------------
-  async function checarSessao() {
-    const r = await fetch('/api/admin/sessao');
-    const dados = await r.json();
-    if (dados.autenticado) {
-      $('tela-login').classList.add('oculto');
-      $('tela-dashboard').classList.remove('oculto');
-      $('topo-usuario').textContent = dados.usuario;
-      $('seguranca-usuario').textContent = dados.usuario;
-      $('alerta-senha-padrao').classList.toggle('oculto', !dados.precisaTrocarSenha);
-      await carregarConfig();
-    } else {
-      $('tela-dashboard').classList.add('oculto');
-      $('tela-login').classList.remove('oculto');
-    }
-  }
-
-  $('form-login').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = $('btn-login');
-    btn.disabled = true;
-    $('login-erro').classList.add('oculto');
-    try {
-      const r = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario: $('login-usuario').value, senha: $('login-senha').value }),
-      });
-      const dados = await r.json();
-      if (!r.ok || !dados.ok) throw new Error(dados.erro || 'Falha no login');
-      await checarSessao();
-    } catch (err) {
-      $('login-erro').textContent = err.message;
-      $('login-erro').classList.remove('oculto');
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  $('btn-logout').addEventListener('click', async () => {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    window.location.reload();
-  });
-
-  $('btn-ir-seguranca').addEventListener('click', () => ativarAba('seguranca'));
-
-  // ------------------------------------------------------------------
   // navegação entre abas
   // ------------------------------------------------------------------
   function ativarAba(nome) {
@@ -171,10 +123,8 @@
   function atualizarLogosCabecalho(cfg) {
     const url = (cfg.marca && cfg.marca.logoUrl) || '';
     const iniciais = (cfg.marca && cfg.marca.monograma) || 'S';
-    [$('login-logo'), $('topo-logo')].forEach((el) => {
-      if (!el) return;
-      el.innerHTML = url ? `<img src="${url}" alt="">` : iniciais;
-    });
+    const el = $('topo-logo');
+    if (el) el.innerHTML = url ? `<img src="${url}" alt="">` : iniciais;
   }
 
   function atualizarPreview(categoria, url) {
@@ -248,7 +198,7 @@
 
       uploads[categoria] = dados.url;
       atualizarPreview(categoria, dados.url);
-      if (categoria === 'logo') atualizarLogosCabecalho({ marca: { logoUrl: dados.url, monograma: $('login-logo').textContent } });
+      if (categoria === 'logo') atualizarLogosCabecalho({ marca: { logoUrl: dados.url, monograma: (CONFIG.marca && CONFIG.marca.monograma) || 'S' } });
 
       // salva imediatamente esse campo, para não perder o upload se a página fechar
       const parcial = {};
@@ -269,7 +219,7 @@
       const parcial = {};
       setPath(parcial, caminho, '');
       await salvarParcial(parcial, false);
-      if (caminho === 'marca.logoUrl') atualizarLogosCabecalho({ marca: { logoUrl: '', monograma: $('login-logo').textContent } });
+      if (caminho === 'marca.logoUrl') atualizarLogosCabecalho({ marca: { logoUrl: '', monograma: (CONFIG.marca && CONFIG.marca.monograma) || 'S' } });
     });
   });
 
@@ -405,36 +355,7 @@
   $('btn-atualizar-rsvps').addEventListener('click', carregarConfirmacoes);
 
   // ------------------------------------------------------------------
-  // trocar senha
+  // início — sem login, carrega direto
   // ------------------------------------------------------------------
-  $('form-senha').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    $('senha-erro').classList.add('oculto');
-    $('senha-sucesso').classList.add('oculto');
-    const nova = $('senha-nova').value;
-    const confirmar = $('senha-confirmar').value;
-    if (nova !== confirmar) {
-      $('senha-erro').textContent = 'As senhas novas não coincidem.';
-      $('senha-erro').classList.remove('oculto');
-      return;
-    }
-    try {
-      const r = await fetch('/api/admin/senha', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ senhaAtual: $('senha-atual').value, senhaNova: nova }),
-      });
-      const dados = await r.json();
-      if (!r.ok || !dados.ok) throw new Error(dados.erro || 'Não foi possível trocar a senha.');
-      $('senha-sucesso').textContent = 'Senha atualizada com sucesso.';
-      $('senha-sucesso').classList.remove('oculto');
-      $('form-senha').reset();
-      $('alerta-senha-padrao').classList.add('oculto');
-    } catch (err) {
-      $('senha-erro').textContent = err.message;
-      $('senha-erro').classList.remove('oculto');
-    }
-  });
-
-  checarSessao();
+  carregarConfig();
 })();
