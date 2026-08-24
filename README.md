@@ -1,45 +1,67 @@
-# Convite Solua — Envelope de Papel Configurável (Netlify)
+# Convite Solua — Envelope de Papel Configurável (Cloudflare Worker)
 
 Convite digital em formato de envelope de papel (textura real, selo de cera,
 carta que desliza para fora) com painel administrativo protegido por login
 em `/admin` — configura tudo (textos, cores, fotos, vídeos, formulário) e
 lista as confirmações recebidas.
 
-Roda inteiramente na Netlify: **Functions** (backend) + **Blobs**
-(armazenamento — configuração, login do admin, confirmações, fotos/vídeos).
-Sem servidor para manter no ar, sem banco externo.
+Roda inteiramente na Cloudflare: **Workers** (backend), **D1** (banco de
+dados) e **KV** (fotos/vídeos enviados + limite de tentativas de login/RSVP).
+Sem servidor Node para manter no ar, sem precisar habilitar R2.
 
-## Estrutura
+## Recursos já provisionados nesta conta
 
+| Recurso | Nome | Uso |
+|---|---|---|
+| D1 | `convite-solua-db` | configuração do convite, login do admin, confirmações |
+| KV | `convite-solua-rate-limit` | fotos/vídeos enviados pelo painel + limite de tentativas |
+
+Os bindings já estão em `wrangler.toml`. O schema (`migrations/0001_init.sql`)
+já foi aplicado no banco remoto.
+
+## Publicar — conectando o repositório (sem terminal)
+
+1. No painel Cloudflare: **Workers & Pages → Create → Import a repository**
+2. Escolha o repositório **Convite**, branch `claude/customizable-paper-invitation-0hft1y`
+3. Deploy — a Cloudflare lê o `wrangler.toml` e conecta D1 + KV automaticamente
+4. No Worker criado → **Settings → Variables and Secrets → Add secret**:
+   nome `SESSION_SECRET`, valor uma string aleatória longa (gere com
+   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+
+Depois é só acessar `/admin` — usuário `admin`, senha inicial `solua14anos`,
+trocar em Segurança.
+
+## Publicar via terminal (alternativa)
+
+```bash
+npm install
+npx wrangler secret put SESSION_SECRET   # cole uma string aleatória longa
+npx wrangler deploy
 ```
-netlify.toml                    → publica public/ e as functions
-public/                         → convite + painel (HTML/CSS/JS estáticos)
-netlify/functions/
-  api.mts                        → todas as rotas /api/* (Hono)
-  uploads.mts                    → serve as fotos/vídeos enviados (/uploads/*)
-  _shared/
-    stores.mts                    → leitura/escrita no Netlify Blobs
-    crypto.mts                     → hash de senha (PBKDF2) e cookie de sessão
-    defaults.mts                    → configuração padrão do convite
+
+## Desenvolvimento local
+
+```bash
+cp .dev.vars.example .dev.vars   # edite o SESSION_SECRET
+npx wrangler d1 execute convite-solua-db --local --file=migrations/0001_init.sql
+npm run dev
 ```
 
-## Variável de ambiente necessária
+## Se esquecer a senha do admin
 
-`SESSION_SECRET` — assina o cookie de sessão do painel admin. Configurada no
-site na Netlify (Project configuration → Environment variables).
+```bash
+npm run gerar-hash-senha -- "novaSenhaForte123"
+```
 
-## Acesso ao painel
-
-`/admin` — usuário `admin`, senha inicial `solua14anos`. Troque assim que
-possível em Segurança.
+O comando imprime um `wrangler d1 execute ... --remote` pronto para colar.
 
 ## O que dá para configurar pelo painel `/admin`
 
 - **Evento**: textos, data/hora real, local, link do mapa, dress code, prazo.
 - **Marca e logo**: upload do logo (envelope, carta e painel) ou monograma.
 - **Aparência**: cores, textura de papel, botões arredondados, selo de cera.
-- **Mídia do cartão**: foto **ou vídeo** dentro da carta, com legenda, poster,
-  autoplay/loop/mudo, e uma mini galeria.
+- **Mídia do cartão**: foto **ou vídeo** dentro da carta (até 18MB), com
+  legenda, poster, autoplay/loop/mudo, e uma mini galeria.
 - **Fundo em tela cheia**: foto **ou vídeo** cobrindo a tela toda a partir da
   abertura do convite.
 - **Formulário (RSVP)**: ativa/obriga cada campo, limite de acompanhantes,
@@ -47,9 +69,19 @@ possível em Segurança.
 - **Confirmações**: lista de quem confirmou, com exportação em CSV.
 - **Integrações**: webhook opcional, WhatsApp/Instagram/site.
 
-## Desenvolvimento local
+## Estrutura
 
-```bash
-npm install
-npx netlify-cli dev
+```
+wrangler.toml         → bindings (D1, KV) e onde os assets estáticos vivem
+migrations/            → schema do D1
+src/
+  index.js              → rotas (Hono) — config, RSVP, login, uploads
+  config-store.js         → leitura/escrita da config no D1
+  auth-store.js            → login e troca de senha (PBKDF2, sem dependências)
+  rsvp-store.js             → confirmações no D1
+  upload.js                  → validação e gravação no KV
+  rate-limit.js                → limite de tentativas via KV
+  crypto.js                     → hash de senha e cookie de sessão assinado
+public/                → convite + painel (HTML/CSS/JS estáticos, servidos direto)
+scripts/gerar-hash-senha.mjs → utilitário pra redefinir a senha via terminal
 ```
