@@ -1,6 +1,6 @@
 /**
  * Configuração padrão do convite — usada apenas na primeira execução, para
- * semear a linha em D1. Depois disso, tudo é editado pelo painel /admin.
+ * semear o blob de config. Depois disso, tudo é editado pelo painel /admin.
  */
 export default {
   evento: {
@@ -27,8 +27,6 @@ export default {
   },
 
   marca: {
-    // Logo usado no envelope, na carta e no painel administrativo.
-    // Se vazio, usa um monograma com as iniciais abaixo.
     logoUrl: "",
     monograma: "S",
     nome: "Solua Imóveis",
@@ -48,9 +46,8 @@ export default {
     selo: { ativo: true, iniciais: "S", cor: "#004BA3" },
   },
 
-  // Mídia dentro da moldura do cartão (foto ou vídeo pequeno, ilustrativo).
   midiaCartao: {
-    tipo: "foto", // "foto" | "video" | "nenhum"
+    tipo: "foto",
     fotoUrl: "",
     fotoAlt: "Foto do evento",
     videoUrl: "",
@@ -63,11 +60,9 @@ export default {
     galeria: [],
   },
 
-  // Fundo em tela cheia (foto ou vídeo) exibido a partir do momento em que
-  // o convite é aberto — cobre toda a tela, atrás da carta.
   fundoTelaCheia: {
     ativo: false,
-    tipo: "foto", // "foto" | "video"
+    tipo: "foto",
     fotoUrl: "",
     videoUrl: "",
     videoMudo: true,
@@ -96,9 +91,6 @@ export default {
   },
 
   envio: {
-    // As confirmações agora ficam salvas no servidor (aba "Confirmações" do
-    // painel admin). O webhook é opcional, só para também replicar em outro
-    // sistema (planilha, Zapier, n8n, etc.).
     webhookAtivo: false,
     webhookUrl: "",
   },
