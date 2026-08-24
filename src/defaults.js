@@ -27,7 +27,7 @@ export default {
   },
 
   marca: {
-    // Logo usado no envelope, na carta e no painel administrativo.
+    // Logo usado na capa, na página de detalhes e no painel administrativo.
     // Se vazio, usa um monograma com as iniciais abaixo.
     logoUrl: "",
     monograma: "S",
@@ -36,16 +36,12 @@ export default {
 
   visual: {
     corPapel: "#F2EDE6",
-    corPapelSombra: "#e4dccb",
-    corEnvelope: "#F2EDE6",
-    corEnvelopeForro: "#004BA3",
     corTinta: "#1c2733",
     corDestaque: "#004BA3",
     corFundo1: "#004BA3",
     corFundo2: "#003d87",
     texturaPapel: true,
     botoesArredondados: true,
-    selo: { ativo: true, iniciais: "S", cor: "#004BA3" },
   },
 
   // Mídia dentro da moldura do cartão (foto ou vídeo pequeno, ilustrativo).
@@ -63,11 +59,11 @@ export default {
     galeria: [],
   },
 
-  // Fundo em tela cheia (foto ou vídeo) exibido a partir do momento em que
-  // o convite é aberto — cobre toda a tela, atrás da carta.
+  // Vídeo (ou foto) de fundo em tela cheia, usado tanto na capa quanto na
+  // página de detalhes — o mesmo arquivo aparece nas duas, só o texto muda.
   fundoTelaCheia: {
-    ativo: false,
-    tipo: "foto", // "foto" | "video"
+    ativo: true,
+    tipo: "video", // "foto" | "video"
     fotoUrl: "",
     videoUrl: "",
     videoMudo: true,
@@ -114,6 +110,5 @@ export default {
     botaoAdicionarCalendario: true,
     botaoCompartilhar: true,
     celebracaoAoConfirmar: true,
-    somAoAbrirEnvelope: false,
   },
 };

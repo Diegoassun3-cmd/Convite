@@ -1,9 +1,11 @@
-# Convite Solua — Envelope de Papel Configurável (Cloudflare Worker)
+# Convite Solua — Configurável (Cloudflare Worker)
 
-Convite digital em formato de envelope de papel (textura real, selo de cera,
-carta que desliza para fora) com painel administrativo protegido por login
-em `/admin` — configura tudo (textos, cores, fotos, vídeos, formulário) e
-lista as confirmações recebidas.
+Convite digital em 3 etapas: **capa** em vídeo (ou foto) de tela cheia com
+botão de confirmar presença, **página de detalhes** com o mesmo vídeo de
+fundo (data/hora, local, traje e contagem regressiva) e **formulário** com
+fundo sólido. Painel administrativo protegido por login em `/admin` —
+configura tudo (textos, cores, fotos, vídeos, formulário) e lista as
+confirmações recebidas.
 
 Roda inteiramente na Cloudflare: **Workers** (backend), **D1** (banco de
 dados) e **KV** (fotos/vídeos enviados + limite de tentativas de login/RSVP).
@@ -58,12 +60,13 @@ O comando imprime um `wrangler d1 execute ... --remote` pronto para colar.
 ## O que dá para configurar pelo painel `/admin`
 
 - **Evento**: textos, data/hora real, local, link do mapa, dress code, prazo.
-- **Marca e logo**: upload do logo (envelope, carta e painel) ou monograma.
-- **Aparência**: cores, textura de papel, botões arredondados, selo de cera.
-- **Mídia do cartão**: foto **ou vídeo** dentro da carta (até 18MB), com
-  legenda, poster, autoplay/loop/mudo, e uma mini galeria.
-- **Fundo em tela cheia**: foto **ou vídeo** cobrindo a tela toda a partir da
-  abertura do convite.
+- **Marca e logo**: upload do logo (página de detalhes e painel) ou monograma.
+- **Aparência**: cores, textura de papel (formulário/confirmação), botões arredondados.
+- **Vídeo/foto de capa**: cobre a tela toda na capa **e** na página de
+  detalhes (é o mesmo arquivo nas duas, só o texto muda).
+- **Mídia da página de detalhes**: foto **ou vídeo** dentro de uma moldura
+  (até 18MB), com legenda, poster, autoplay/loop/mudo, e uma mini galeria.
+- **Traje**: texto do dress code + link opcional que vira um botão.
 - **Formulário (RSVP)**: ativa/obriga cada campo, limite de acompanhantes,
   pergunta extra livre.
 - **Confirmações**: lista de quem confirmou, com exportação em CSV.

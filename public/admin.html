@@ -61,7 +61,7 @@
       <button data-aba="marca">Marca e Logo</button>
       <button data-aba="aparencia">Aparência</button>
       <button data-aba="midia">Mídia do Cartão</button>
-      <button data-aba="fundo">Fundo em Tela Cheia</button>
+      <button data-aba="fundo">Vídeo de Capa</button>
       <button data-aba="formulario">Formulário</button>
       <button data-aba="confirmacoes">Confirmações</button>
       <button data-aba="envio">Integrações</button>
@@ -74,15 +74,15 @@
       <section class="painel ativa" data-painel="evento">
         <div class="secao">
           <h2>Textos do convite</h2>
-          <p class="descricao">O que aparece no envelope e na carta.</p>
+          <p class="descricao">O que aparece na capa e na página de detalhes.</p>
           <div class="grade-2">
-            <div class="campo"><label>Chamada no envelope</label><input type="text" data-path="evento.chamada"></div>
+            <div class="campo"><label>Chamada na capa</label><input type="text" data-path="evento.chamada"></div>
             <div class="campo"><label>Anfitrião</label><input type="text" data-path="evento.anfitriao"></div>
             <div class="campo"><label>Título do evento</label><input type="text" data-path="evento.titulo"></div>
             <div class="campo"><label>Subtítulo</label><input type="text" data-path="evento.subtitulo"></div>
           </div>
-          <div class="campo"><label>Saudação (se não houver nome personalizado na URL)</label><input type="text" data-path="evento.saudacao"></div>
-          <div class="campo"><label>Mensagem do convite</label><textarea data-path="evento.mensagem"></textarea></div>
+          <div class="campo"><label>Saudação na capa (se não houver nome personalizado na URL)</label><input type="text" data-path="evento.saudacao"></div>
+          <div class="campo"><label>Mensagem do convite (página de detalhes)</label><textarea data-path="evento.mensagem"></textarea></div>
         </div>
 
         <div class="secao">
@@ -104,7 +104,7 @@
           <h2>Traje e observações</h2>
           <div class="grade-2">
             <div class="campo"><label>Dress code</label><input type="text" data-path="evento.trajes.texto" placeholder="Ex: Esporte fino"></div>
-            <div class="campo"><label>Link de referência do traje (opcional)</label><input type="text" data-path="evento.trajes.link"></div>
+            <div class="campo"><label>Link de referência do traje (vira um botão na página de detalhes)</label><input type="text" data-path="evento.trajes.link" placeholder="https://..."></div>
           </div>
           <div class="linha-toggle">
             <div class="txt"><strong>Aviso extra</strong><span>Um card adicional livre, ex: "Presentes", "Estacionamento"</span></div>
@@ -121,7 +121,7 @@
       <section class="painel" data-painel="marca">
         <div class="secao">
           <h2>Logo</h2>
-          <p class="descricao">Usado no envelope, na carta e aqui no painel. Se não enviar um logo, um monograma com as iniciais é usado no lugar.</p>
+          <p class="descricao">Usado na página de detalhes e aqui no painel. Se não enviar um logo, um monograma com as iniciais é usado no lugar.</p>
           <div class="upload-area">
             <div class="upload-preview" id="preview-logo"></div>
             <div class="upload-info">
@@ -148,34 +148,24 @@
       <section class="painel" data-painel="aparencia">
         <div class="secao">
           <h2>Cores</h2>
-          <p class="descricao">Paleta da marca, aplicada ao envelope, à carta e aos botões.</p>
+          <p class="descricao">Paleta da marca, aplicada à capa, à página de detalhes, ao formulário e aos botões.</p>
           <div class="grade-3">
-            <div class="campo"><label>Papel</label><div class="campo-cor"><input type="color" data-path="visual.corPapel" data-par="cor-papel-txt"><input type="text" id="cor-papel-txt" data-path="visual.corPapel"></div></div>
+            <div class="campo"><label>Papel (formulário e confirmação)</label><div class="campo-cor"><input type="color" data-path="visual.corPapel" data-par="cor-papel-txt"><input type="text" id="cor-papel-txt" data-path="visual.corPapel"></div></div>
             <div class="campo"><label>Cor de destaque (marca)</label><div class="campo-cor"><input type="color" data-path="visual.corDestaque" data-par="cor-destaque-txt"><input type="text" id="cor-destaque-txt" data-path="visual.corDestaque"></div></div>
             <div class="campo"><label>Texto (tinta)</label><div class="campo-cor"><input type="color" data-path="visual.corTinta" data-par="cor-tinta-txt"><input type="text" id="cor-tinta-txt" data-path="visual.corTinta"></div></div>
-            <div class="campo"><label>Envelope</label><div class="campo-cor"><input type="color" data-path="visual.corEnvelope" data-par="cor-envelope-txt"><input type="text" id="cor-envelope-txt" data-path="visual.corEnvelope"></div></div>
-            <div class="campo"><label>Forro do envelope</label><div class="campo-cor"><input type="color" data-path="visual.corEnvelopeForro" data-par="cor-forro-txt"><input type="text" id="cor-forro-txt" data-path="visual.corEnvelopeForro"></div></div>
-            <div class="campo"><label>Fundo (atrás do envelope)</label><div class="campo-cor"><input type="color" data-path="visual.corFundo1" data-par="cor-fundo1-txt"><input type="text" id="cor-fundo1-txt" data-path="visual.corFundo1"></div></div>
+            <div class="campo"><label>Fundo (atrás do vídeo/foto de capa)</label><div class="campo-cor"><input type="color" data-path="visual.corFundo1" data-par="cor-fundo1-txt"><input type="text" id="cor-fundo1-txt" data-path="visual.corFundo1"></div></div>
           </div>
         </div>
 
         <div class="secao">
           <h2>Estilo</h2>
           <div class="linha-toggle">
-            <div class="txt"><strong>Textura de papel</strong><span>Grão sutil de fibra no envelope e na carta</span></div>
+            <div class="txt"><strong>Textura de papel</strong><span>Grão sutil de fibra no formulário e no cartão de confirmação</span></div>
             <input type="checkbox" class="chave" data-path="visual.texturaPapel">
           </div>
           <div class="linha-toggle">
             <div class="txt"><strong>Botões arredondados</strong><span>Estilo pílula nos botões (desative para cantos discretos)</span></div>
             <input type="checkbox" class="chave" data-path="visual.botoesArredondados">
-          </div>
-          <div class="linha-toggle">
-            <div class="txt"><strong>Selo de cera</strong><span>Mostrar o selo clicável no envelope</span></div>
-            <input type="checkbox" class="chave" data-path="visual.selo.ativo">
-          </div>
-          <div class="grade-2">
-            <div class="campo"><label>Iniciais do selo</label><input type="text" maxlength="2" data-path="visual.selo.iniciais"></div>
-            <div class="campo"><label>Cor do selo</label><div class="campo-cor"><input type="color" data-path="visual.selo.cor" data-par="cor-selo-txt"><input type="text" id="cor-selo-txt" data-path="visual.selo.cor"></div></div>
           </div>
         </div>
       </section>
@@ -183,8 +173,8 @@
       <!-- ---------------- MÍDIA DO CARTÃO ---------------- -->
       <section class="painel" data-painel="midia">
         <div class="secao">
-          <h2>Foto ou vídeo dentro da carta</h2>
-          <p class="descricao">Aparece dentro de uma moldura, junto com os detalhes do evento.</p>
+          <h2>Foto ou vídeo na página de detalhes</h2>
+          <p class="descricao">Aparece dentro de uma moldura, junto com os detalhes do evento (data, local, traje).</p>
           <div class="campo">
             <label>Tipo de mídia</label>
             <select data-path="midiaCartao.tipo" id="select-midia-tipo">
@@ -253,10 +243,10 @@
       <!-- ---------------- FUNDO TELA CHEIA ---------------- -->
       <section class="painel" data-painel="fundo">
         <div class="secao">
-          <h2>Fundo em tela cheia</h2>
-          <p class="descricao">Uma foto ou vídeo que preenche toda a tela por trás da carta, a partir do momento em que o convidado abre o convite.</p>
+          <h2>Vídeo (ou foto) de capa</h2>
+          <p class="descricao">Preenche toda a tela na capa e na página de detalhes — é o mesmo arquivo nas duas, só o texto muda entre elas.</p>
           <div class="linha-toggle">
-            <div class="txt"><strong>Ativar fundo em tela cheia</strong></div>
+            <div class="txt"><strong>Ativar vídeo/foto de capa</strong></div>
             <input type="checkbox" class="chave" data-path="fundoTelaCheia.ativo">
           </div>
           <div class="campo">
@@ -359,7 +349,6 @@
           <div class="linha-toggle"><div class="txt"><strong>Botão "adicionar ao calendário"</strong></div><input type="checkbox" class="chave" data-path="recursos.botaoAdicionarCalendario"></div>
           <div class="linha-toggle"><div class="txt"><strong>Botão de compartilhar</strong></div><input type="checkbox" class="chave" data-path="recursos.botaoCompartilhar"></div>
           <div class="linha-toggle"><div class="txt"><strong>Confete ao confirmar presença</strong></div><input type="checkbox" class="chave" data-path="recursos.celebracaoAoConfirmar"></div>
-          <div class="linha-toggle"><div class="txt"><strong>Som sutil ao abrir o envelope</strong></div><input type="checkbox" class="chave" data-path="recursos.somAoAbrirEnvelope"></div>
         </div>
       </section>
 

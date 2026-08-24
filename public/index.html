@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Convite</title>
-<meta name="description" content="Convite digital em formato de envelope de papel — abra, leia e confirme presença.">
+<meta name="description" content="Convite digital — vídeo de capa, detalhes do evento e confirmação de presença.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -15,60 +15,32 @@
 
 <div class="app" id="app">
 
-  <!-- ================= ETAPA 1: ENVELOPE ================= -->
-  <section class="etapa envelope-etapa" id="etapa-envelope">
-    <p class="chamada-inicial" id="txt-chamada">VOCÊ ESTÁ CONVIDADO</p>
-
-    <div class="cena-envelope">
-      <div class="envelope" id="envelope">
-
-        <div class="envelope-bolso textura"></div>
-
-        <div class="carta-espiando textura" id="carta-espiando" tabindex="0" role="button" aria-label="Puxar carta do envelope">
-          <span class="dica-puxar">TOQUE PARA LER</span>
-        </div>
-
-        <div class="envelope-frente textura">
-          <div class="envelope-endereco">
-            <small>PARA</small>
-            <span id="txt-endereco">Convidado(a) Especial</span>
-          </div>
-        </div>
-
-        <div class="envelope-aba textura" id="envelope-aba"></div>
-
-        <button class="selo-cera" id="btn-selo" aria-label="Abrir convite" type="button">
-          <span id="selo-iniciais">S</span>
-        </button>
-
-      </div>
+  <!-- ================= ETAPA 1: CAPA (vídeo/foto + confirmar) ================= -->
+  <section class="etapa capa-etapa" id="etapa-capa">
+    <div class="capa-conteudo">
+      <p class="chamada-inicial" id="txt-chamada">VOCÊ ESTÁ CONVIDADO</p>
+      <h1 class="capa-titulo" id="txt-capa-titulo">Título do Evento</h1>
+      <p class="capa-subtitulo" id="txt-capa-subtitulo">SUBTÍTULO</p>
+      <p class="capa-saudacao oculto" id="txt-capa-saudacao"></p>
+      <button class="btn btn-primario btn-capa" id="btn-confirmar-capa" type="button">CONFIRMAR PRESENÇA</button>
     </div>
-
-    <p class="instrucao-selo" id="instrucao-selo">Toque no selo para abrir o convite</p>
   </section>
 
-  <!-- ================= ETAPA 2: CARTA / CONVITE ================= -->
-  <section class="etapa carta-etapa oculto" id="etapa-carta">
-    <div class="carta-papel textura">
-      <div class="carta-faixa"></div>
+  <!-- ================= ETAPA 2: DETALHES (mesmo vídeo, textos do evento) ================= -->
+  <section class="etapa detalhes-etapa oculto" id="etapa-detalhes">
+    <div class="detalhes-conteudo">
 
-      <div class="carta-topo">
+      <div class="detalhes-topo">
         <div class="carta-logo" id="carta-logo">S</div>
         <p class="carta-anfitriao" id="txt-anfitriao">ANFITRIÃO</p>
-        <p class="carta-saudacao" id="txt-saudacao">Com muita alegria</p>
-        <h1 class="carta-titulo" id="txt-titulo">Título do Evento</h1>
-        <p class="carta-subtitulo" id="txt-subtitulo">SUBTÍTULO</p>
+        <p class="carta-mensagem" id="txt-mensagem">Mensagem do convite.</p>
       </div>
-
-      <div class="divisor"></div>
-
-      <p class="carta-mensagem" id="txt-mensagem">Mensagem do convite.</p>
 
       <div id="midia-container"></div>
 
       <div id="galeria-container"></div>
 
-      <div class="detalhes-grade">
+      <div class="detalhes-grade vidro">
         <div class="detalhe-item">
           <div class="rotulo">DATA E HORA</div>
           <div class="valor" id="txt-data">--</div>
@@ -82,6 +54,7 @@
         <div class="detalhe-item oculto" id="bloco-trajes">
           <div class="rotulo">TRAJE</div>
           <div class="valor" id="txt-traje">--</div>
+          <a href="#" class="btn btn-secundario btn-pequeno btn-traje oculto" id="link-traje-btn" target="_blank" rel="noopener">VER REFERÊNCIA</a>
         </div>
       </div>
 
@@ -94,12 +67,12 @@
 
       <div class="botoes-carta">
         <button class="btn btn-primario btn-bloco" id="btn-ir-formulario" type="button">CONFIRMAR PRESENÇA</button>
-        <button class="btn btn-secundario btn-bloco" id="btn-voltar-envelope" type="button">GUARDAR NO ENVELOPE</button>
+        <button class="btn btn-secundario btn-bloco" id="btn-voltar-capa" type="button">VOLTAR</button>
       </div>
     </div>
   </section>
 
-  <!-- ================= ETAPA 3: FORMULÁRIO ================= -->
+  <!-- ================= ETAPA 3: FORMULÁRIO (fundo sólido) ================= -->
   <section class="etapa oculto" id="etapa-form">
     <div class="cabecalho-etapa">
       <h2 id="txt-form-titulo">Confirme sua presença</h2>
@@ -153,7 +126,7 @@
     </form>
   </section>
 
-  <!-- ================= ETAPA 4: CONFIRMAÇÃO ================= -->
+  <!-- ================= ETAPA 4: CONFIRMAÇÃO (fundo sólido) ================= -->
   <section class="etapa confirmacao-etapa oculto" id="etapa-confirmacao">
     <div class="selo-sucesso">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M5 12.5 L10 17.5 L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>

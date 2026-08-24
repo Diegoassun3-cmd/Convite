@@ -36,19 +36,17 @@
     const v = CFG.visual || {};
     const root = document.documentElement.style;
     const mapa = {
-      corPapel: '--papel', corPapelSombra: '--papel-sombra',
-      corEnvelope: '--envelope', corEnvelopeForro: '--envelope-forro',
+      corPapel: '--papel',
       corTinta: '--tinta', corDestaque: '--destaque',
       corFundo1: '--fundo-1', corFundo2: '--fundo-2',
     };
     Object.keys(mapa).forEach((chave) => { if (v[chave]) root.setProperty(mapa[chave], v[chave]); });
-    if (v.selo && v.selo.cor) root.setProperty('--cor-selo', v.selo.cor);
     root.setProperty('--raio-botao', v.botoesArredondados === false ? '10px' : '999px');
     if (!v.texturaPapel) document.querySelectorAll('.textura').forEach((el) => el.classList.remove('textura'));
   }
 
   // ------------------------------------------------------------------
-  // 2. Fundo em tela cheia (foto ou vídeo), a partir da abertura do convite
+  // 2. Fundo em tela cheia (foto ou vídeo) — capa e página de detalhes
   // ------------------------------------------------------------------
   function montarFundoTelaCheia() {
     const f = CFG.fundoTelaCheia || {};
@@ -88,19 +86,25 @@
   }
 
   // ------------------------------------------------------------------
-  // 4. Preenche textos do envelope e da carta
+  // 4. Preenche textos da capa e da página de detalhes
   // ------------------------------------------------------------------
   function preencherConteudo() {
     const ev = CFG.evento || {};
-    const v = CFG.visual || {};
     const marca = CFG.marca || {};
     const convidado = nomeConvidado();
 
+    // ---- capa ----
     if ($('txt-chamada')) $('txt-chamada').textContent = (ev.chamada || 'Você está convidado').toUpperCase();
-    if ($('txt-endereco')) $('txt-endereco').textContent = convidado || (CFG.personalizacao && CFG.personalizacao.textoPadrao) || 'Convidado(a) Especial';
-    if ($('selo-iniciais')) $('selo-iniciais').textContent = (v.selo && v.selo.iniciais) || marca.monograma || 'S';
-    if (v.selo && v.selo.ativo === false) { $('btn-selo') && ($('btn-selo').style.display = 'none'); }
+    if ($('txt-capa-titulo')) $('txt-capa-titulo').textContent = ev.titulo || '';
+    textoOuOculta('txt-capa-subtitulo', (ev.subtitulo || '').toUpperCase());
 
+    if ($('txt-capa-saudacao')) {
+      const saudacao = convidado ? `Querido(a) ${convidado},` : (ev.saudacao || '');
+      if (saudacao) { $('txt-capa-saudacao').textContent = saudacao; $('txt-capa-saudacao').classList.remove('oculto'); }
+      else $('txt-capa-saudacao').classList.add('oculto');
+    }
+
+    // ---- detalhes ----
     const logoEl = $('carta-logo');
     if (logoEl) {
       if (marca.logoUrl) logoEl.innerHTML = `<img src="${escaparHtml(marca.logoUrl)}" alt="${escaparHtml(marca.nome || 'Logo')}">`;
@@ -108,9 +112,6 @@
     }
 
     if ($('txt-anfitriao')) $('txt-anfitriao').textContent = (ev.anfitriao || marca.nome || '').toUpperCase();
-    if ($('txt-saudacao')) textoOuOculta('txt-saudacao', convidado ? `Querido(a) ${convidado},` : (ev.saudacao || ''));
-    if ($('txt-titulo')) $('txt-titulo').textContent = ev.titulo || '';
-    textoOuOculta('txt-subtitulo', (ev.subtitulo || '').toUpperCase());
     textoOuOculta('txt-mensagem', ev.mensagem);
 
     if ($('txt-data')) $('txt-data').textContent = ev.dataLabel || '';
@@ -121,6 +122,11 @@
     if (ev.trajes && ev.trajes.texto) {
       $('bloco-trajes') && $('bloco-trajes').classList.remove('oculto');
       $('txt-traje') && ($('txt-traje').textContent = ev.trajes.texto);
+      const btnTraje = $('link-traje-btn');
+      if (btnTraje) {
+        if (ev.trajes.link) { btnTraje.href = ev.trajes.link; btnTraje.classList.remove('oculto'); }
+        else btnTraje.classList.add('oculto');
+      }
     }
     if (ev.avisoExtra && ev.avisoExtra.ativo) {
       $('aviso-extra') && $('aviso-extra').classList.remove('oculto');
@@ -132,7 +138,7 @@
   }
 
   // ------------------------------------------------------------------
-  // 5. Mídia dentro da carta: foto, vídeo ou nada — e mini galeria
+  // 5. Mídia dentro da página de detalhes: foto, vídeo ou nada — e galeria
   // ------------------------------------------------------------------
   function montarMidia() {
     const m = CFG.midiaCartao || {};
@@ -233,9 +239,12 @@
   // ------------------------------------------------------------------
   function montarFormulario() {
     const f = (CFG.formulario && CFG.formulario.campos) || {};
+    const textoBotaoConfirmar = (CFG.formulario && CFG.formulario.textoBotao) || 'CONFIRMAR PRESENÇA';
     $('txt-form-titulo') && ($('txt-form-titulo').textContent = (CFG.formulario && CFG.formulario.titulo) || 'Confirme sua presença');
     $('txt-form-subtitulo') && ($('txt-form-subtitulo').textContent = (CFG.formulario && CFG.formulario.subtitulo) || '');
-    $('btn-enviar-form') && ($('btn-enviar-form').textContent = (CFG.formulario && CFG.formulario.textoBotao) || 'CONFIRMAR PRESENÇA');
+    $('btn-enviar-form') && ($('btn-enviar-form').textContent = textoBotaoConfirmar);
+    $('btn-ir-formulario') && ($('btn-ir-formulario').textContent = textoBotaoConfirmar);
+    $('btn-confirmar-capa') && ($('btn-confirmar-capa').textContent = textoBotaoConfirmar);
 
     function config(campo) { return f[campo] || { ativo: true, obrigatorio: false }; }
 
@@ -283,34 +292,21 @@
   // ------------------------------------------------------------------
   // 8. Navegação entre etapas
   // ------------------------------------------------------------------
-  const etapas = ['etapa-envelope', 'etapa-carta', 'etapa-form', 'etapa-confirmacao'];
+  const etapas = ['etapa-capa', 'etapa-detalhes', 'etapa-form', 'etapa-confirmacao'];
+  const ETAPAS_COM_VIDEO = ['etapa-capa', 'etapa-detalhes'];
+
   function mostrarEtapa(id) {
     etapas.forEach((e) => { $(e).classList.toggle('oculto', e !== id); });
-    ativarFundoTelaCheia(id !== 'etapa-envelope');
+    const usaVideo = ETAPAS_COM_VIDEO.indexOf(id) !== -1;
+    document.body.classList.toggle('pagina-solida', !usaVideo);
+    ativarFundoTelaCheia(usaVideo);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function abrirEnvelope() {
-    $('envelope').classList.add('aberto');
-    if ($('instrucao-selo')) $('instrucao-selo').textContent = 'Toque na carta para ler o convite';
-    if (CFG.recursos && CFG.recursos.somAoAbrirEnvelope) tocarSomAbrir();
+  function irParaDetalhes() {
+    mostrarEtapa('etapa-detalhes');
+    iniciarContagem();
   }
-
-  function tocarSomAbrir() {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'triangle';
-      o.frequency.setValueAtTime(340, ctx.currentTime);
-      g.gain.setValueAtTime(0.06, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      o.connect(g).connect(ctx.destination);
-      o.start(); o.stop(ctx.currentTime + 0.4);
-    } catch (e) { /* silencioso se não suportado */ }
-  }
-
-  function irParaCarta() { mostrarEtapa('etapa-carta'); iniciarContagem(); }
 
   // ------------------------------------------------------------------
   // 9. Envio do formulário (para o servidor)
@@ -460,9 +456,7 @@
   // ------------------------------------------------------------------
   function resetarTudo() {
     $('form-confirmar') && $('form-confirmar').reset();
-    $('envelope') && $('envelope').classList.remove('aberto');
-    if ($('instrucao-selo')) $('instrucao-selo').textContent = 'Toque no selo para abrir o convite';
-    mostrarEtapa('etapa-envelope');
+    mostrarEtapa('etapa-capa');
   }
 
   // ------------------------------------------------------------------
@@ -482,25 +476,12 @@
     preencherConteudo();
     montarMidia();
     montarFormulario();
+    mostrarEtapa('etapa-capa');
 
-    $('btn-selo') && $('btn-selo').addEventListener('click', abrirEnvelope);
-    $('carta-espiando') && $('carta-espiando').addEventListener('click', () => {
-      if ($('envelope').classList.contains('aberto')) irParaCarta(); else abrirEnvelope();
-    });
-    $('carta-espiando') && $('carta-espiando').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if ($('envelope').classList.contains('aberto')) irParaCarta(); else abrirEnvelope();
-      }
-    });
-
+    $('btn-confirmar-capa') && $('btn-confirmar-capa').addEventListener('click', irParaDetalhes);
     $('btn-ir-formulario') && $('btn-ir-formulario').addEventListener('click', () => mostrarEtapa('etapa-form'));
-    $('btn-voltar-envelope') && $('btn-voltar-envelope').addEventListener('click', () => {
-      $('envelope').classList.remove('aberto');
-      if ($('instrucao-selo')) $('instrucao-selo').textContent = 'Toque no selo para abrir o convite';
-      mostrarEtapa('etapa-envelope');
-    });
-    $('btn-voltar-carta') && $('btn-voltar-carta').addEventListener('click', () => mostrarEtapa('etapa-carta'));
+    $('btn-voltar-capa') && $('btn-voltar-capa').addEventListener('click', () => mostrarEtapa('etapa-capa'));
+    $('btn-voltar-carta') && $('btn-voltar-carta').addEventListener('click', () => mostrarEtapa('etapa-detalhes'));
     $('form-confirmar') && $('form-confirmar').addEventListener('submit', handleSubmitForm);
     $('btn-nova-confirmacao') && $('btn-nova-confirmacao').addEventListener('click', resetarTudo);
   }

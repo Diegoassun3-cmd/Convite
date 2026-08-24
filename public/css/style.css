@@ -9,9 +9,6 @@
 
 :root {
   --papel: #F2EDE6;
-  --papel-sombra: #e4dccb;
-  --envelope: #F2EDE6;
-  --envelope-forro: #004BA3;
   --tinta: #1c2733;
   --tinta-suave: #5c6672;
   --destaque: #004BA3;
@@ -20,7 +17,6 @@
   --fundo-2: #003d87;
   --raio-botao: 999px;
   --raio-card: 26px;
-  --raio-envelope: 8px;
 
   --fonte-titulo: 'Nyata', Georgia, serif;
   --fonte-corpo: 'Satoshi', Arial, sans-serif;
@@ -45,7 +41,8 @@ body {
 }
 html { overflow-x: hidden; }
 
-/* fundo padrão — azul sólido da marca, com uma leve profundidade */
+/* fundo padrão — azul sólido da marca (capa/detalhes) ou papel sólido
+   (formulário/confirmação), conforme a etapa atual */
 .fundo-padrao {
   position: fixed;
   inset: 0;
@@ -53,10 +50,12 @@ html { overflow-x: hidden; }
   background:
     radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.08), transparent 55%),
     linear-gradient(160deg, var(--fundo-1) 0%, var(--fundo-2) 100%);
+  transition: background 0.5s ease;
 }
+body.pagina-solida .fundo-padrao { background: var(--papel); }
 
-/* fundo em tela cheia configurável (foto ou vídeo), exibido a partir da
-   abertura do convite */
+/* fundo em tela cheia configurável (foto ou vídeo) — mostrado na capa e na
+   página de detalhes, atrás do conteúdo */
 .fundo-tela-cheia {
   position: fixed;
   inset: 0;
@@ -109,8 +108,16 @@ html { overflow-x: hidden; }
 .cabecalho-etapa h2 { font-family: var(--fonte-titulo); font-weight: 400; font-size: 30px; letter-spacing: 0.3px; }
 .cabecalho-etapa p { font-family: var(--fonte-corpo); font-size: 13px; letter-spacing: 0.3px; color: rgba(255,255,255,0.72); margin-top: 8px; }
 
-/* ============================== ENVELOPE ================================= */
-.envelope-etapa { text-align: center; }
+/* ============================== CAPA (vídeo + confirmar) ================= */
+.capa-etapa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(78vh, 620px);
+  text-align: center;
+}
+
+.capa-conteudo { max-width: 380px; padding: 0 10px; }
 
 .chamada-inicial {
   font-family: var(--fonte-corpo);
@@ -118,166 +125,43 @@ html { overflow-x: hidden; }
   font-size: 13px;
   letter-spacing: 3px;
   font-weight: 500;
-  margin-bottom: 28px;
-  opacity: 0.9;
+  margin-bottom: 22px;
+  opacity: 0.92;
 }
 
-.cena-envelope {
-  perspective: 1400px;
-  margin: 0 auto 30px;
-  width: 100%;
-  max-width: 320px;
-  aspect-ratio: 10 / 9;
-  position: relative;
-}
-
-.envelope { position: relative; width: 100%; height: 100%; }
-
-.envelope-bolso {
-  position: absolute;
-  inset: 0;
-  background: var(--envelope);
-  border-radius: var(--raio-envelope);
-  box-shadow: var(--sombra-forte);
-  z-index: 1;
-}
-
-.carta-espiando {
-  position: absolute;
-  left: 6%;
-  right: 6%;
-  top: 8%;
-  bottom: 4%;
-  background: var(--papel);
-  border-radius: 18px 18px 6px 6px;
-  box-shadow: 0 -8px 20px rgba(0, 10, 40, 0.18);
-  transform: translateY(0);
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 2;
-  cursor: pointer;
-  border: 1px solid rgba(0, 75, 163, 0.18);
-}
-.carta-espiando.textura::after { border-radius: inherit; }
-.envelope.aberto .carta-espiando { transform: translateY(-40%); }
-
-.carta-espiando .dica-puxar {
-  position: absolute;
-  top: 12px; left: 0; right: 0;
-  text-align: center;
-  font-family: var(--fonte-corpo);
-  font-size: 10.5px;
-  letter-spacing: 1.5px;
-  color: var(--destaque);
-  font-weight: 500;
-  opacity: 0;
-  transition: opacity 0.4s ease 0.5s;
-}
-.envelope.aberto .dica-puxar { opacity: 1; animation: flutuar 1.6s ease-in-out infinite; }
-@keyframes flutuar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
-
-.envelope-frente {
-  position: absolute;
-  inset: 0;
-  background: var(--envelope);
-  border-radius: var(--raio-envelope);
-  z-index: 3;
-  display: flex;
-  align-items: flex-end;
-  padding: 16% 12% 9%;
-  box-shadow: inset 0 0 0 1px rgba(0, 75, 163, 0.12);
-  pointer-events: none;
-  overflow: hidden;
-}
-
-/* costura em diamante do envelope — as abas de trás (esquerda, direita e
-   inferior) já coladas, encontrando-se num ponto central, como um envelope
-   de papel construído de verdade (não só uma caixa lisa) */
-.envelope-frente::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon points='0,50 0,100 50,74' fill='rgba(0,20,50,0.045)'/><polygon points='100,50 100,100 50,74' fill='rgba(0,20,50,0.02)'/><polygon points='0,100 100,100 50,74' fill='rgba(255,255,255,0.22)'/><g stroke='rgba(0,40,95,0.16)' stroke-width='0.6' fill='none'><path d='M0,50 L50,74 L100,50'/><path d='M0,100 L50,74 L100,100'/></g></svg>");
-  background-size: 100% 100%;
-  pointer-events: none;
-}
-
-.envelope-endereco { text-align: left; font-family: var(--fonte-titulo); color: var(--tinta); line-height: 1.15; position: relative; z-index: 1; }
-.envelope-endereco small {
-  display: block; font-family: var(--fonte-corpo); font-size: 9.5px; letter-spacing: 1.5px;
-  color: var(--tinta-suave); font-weight: 500; margin-bottom: 3px;
-}
-.envelope-endereco span { font-size: 24px; }
-
-.envelope-aba {
-  position: absolute; top: 0; left: 0; width: 100%; height: 50%;
-  background: linear-gradient(160deg, var(--envelope) 0%, var(--papel-sombra) 55%, var(--envelope) 100%);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  transform-origin: top center;
-  transform: rotateX(0deg);
-  transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
-  z-index: 5;
-  box-shadow: inset 0 0 0 1px rgba(0, 75, 163, 0.12);
-  filter:
-    drop-shadow(0 0 1.5px var(--destaque))
-    drop-shadow(0 3px 0 var(--envelope-forro))
-    drop-shadow(0 6px 10px rgba(0, 10, 40, 0.28));
-  border-top-left-radius: var(--raio-envelope);
-  border-top-right-radius: var(--raio-envelope);
-}
-.envelope-aba::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(160deg, rgba(255,255,255,0.35), transparent 45%);
-}
-.envelope.aberto .envelope-aba { transform: rotateX(-178deg); z-index: 1; }
-
-.selo-cera {
-  position: absolute; top: 46%; left: 50%; width: 50px; height: 50px;
-  margin: -25px 0 0 -25px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border: none;
+.capa-titulo {
   font-family: var(--fonte-titulo);
-  font-weight: 400; font-size: 20px;
+  font-weight: 400;
+  font-size: 46px;
+  line-height: 1.1;
   color: #fff;
-  background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.4), transparent 45%), var(--cor-selo, var(--destaque));
-  box-shadow: 0 6px 14px rgba(0, 10, 40, 0.35), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 3px 4px rgba(255,255,255,0.25);
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-  animation: respirar 2.4s ease-in-out infinite;
-  z-index: 6;
-}
-.selo-cera:hover { transform: scale(1.06); }
-.envelope.aberto .selo-cera { transform: scale(0.4) rotate(35deg); opacity: 0; pointer-events: none; animation: none; }
-@keyframes respirar {
-  0%, 100% { box-shadow: 0 6px 14px rgba(0,10,40,0.35), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 3px 4px rgba(255,255,255,0.25), 0 0 0 0 rgba(0,75,163,0); }
-  50% { box-shadow: 0 6px 18px rgba(0,10,40,0.4), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 3px 4px rgba(255,255,255,0.25), 0 0 0 9px rgba(0,75,163,0.1); }
+  text-shadow: 0 4px 26px rgba(0, 10, 40, 0.35);
 }
 
-.instrucao-selo {
-  margin-top: 18px; font-family: var(--fonte-corpo); font-size: 12px;
-  letter-spacing: 0.4px; color: rgba(255,255,255,0.75); font-weight: 500;
+.capa-subtitulo {
+  font-family: var(--fonte-corpo);
+  font-size: 12.5px;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 14px;
 }
 
-/* ============================== CARTA (CONVITE) =========================== */
-.carta-etapa { display: flex; justify-content: center; }
-
-.carta-papel {
-  --carta-pad-x: 28px;
-  position: relative;
-  width: 100%;
-  background: var(--papel);
-  border-radius: var(--raio-card);
-  box-shadow: var(--sombra-forte);
-  padding: 38px var(--carta-pad-x) 30px;
-  overflow: hidden;
+.capa-saudacao {
+  font-family: var(--fonte-corpo);
+  font-style: italic;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: 18px;
 }
 
-.carta-faixa {
-  position: absolute; top: 0; left: 0; right: 0; height: 5px;
-  background: var(--destaque);
-}
+.btn-capa { margin-top: 34px; padding: 16px 44px; }
 
-.carta-topo { text-align: center; position: relative; z-index: 1; }
+/* ============================== DETALHES (segunda página) ================ */
+.detalhes-etapa { display: flex; justify-content: center; }
+.detalhes-conteudo { width: 100%; padding: 6px 4px 0; }
+
+.detalhes-topo { text-align: center; margin-bottom: 26px; }
 
 .carta-logo {
   width: 56px; height: 56px; border-radius: 50%;
@@ -285,26 +169,27 @@ html { overflow-x: hidden; }
   margin: 0 auto 16px;
   font-family: var(--fonte-titulo); font-size: 22px; color: #fff;
   background: var(--destaque);
+  box-shadow: var(--sombra-suave);
   overflow: hidden;
 }
 .carta-logo img { width: 100%; height: 100%; object-fit: cover; }
 
-.carta-anfitriao { font-family: var(--fonte-corpo); font-size: 11px; letter-spacing: 2.5px; font-weight: 500; color: var(--tinta-suave); margin-bottom: 12px; }
-.carta-saudacao { font-family: var(--fonte-corpo); font-size: 15px; font-style: italic; color: var(--destaque); margin-bottom: 6px; }
-.carta-titulo { font-family: var(--fonte-titulo); font-size: 36px; font-weight: 400; color: var(--tinta); line-height: 1.12; }
-.carta-subtitulo { font-family: var(--fonte-corpo); font-size: 11.5px; letter-spacing: 2px; font-weight: 500; color: var(--destaque); margin-top: 10px; }
+.carta-anfitriao {
+  font-family: var(--fonte-corpo); font-size: 11px; letter-spacing: 2.5px; font-weight: 600;
+  color: rgba(255, 255, 255, 0.8); margin-bottom: 14px;
+}
+.carta-mensagem {
+  font-size: 15.5px; line-height: 1.65; color: #fff; text-align: center;
+  text-shadow: 0 2px 14px rgba(0, 10, 40, 0.3);
+}
 
-.divisor { width: 46px; height: 3px; background: var(--destaque); border-radius: 3px; margin: 22px auto; opacity: 0.85; }
-
-.carta-mensagem { font-size: 16px; line-height: 1.65; color: var(--tinta); text-align: center; margin-bottom: 22px; position: relative; z-index: 1; }
-
-/* a foto/vídeo ocupa a largura inteira do papel (sangria até a borda do
-   cartão), como se fosse uma parte impressa da própria folha */
+/* a foto/vídeo do cartão, dentro de uma moldura arredondada */
 .midia-moldura {
   position: relative;
-  margin: 4px calc(-1 * var(--carta-pad-x)) 22px;
+  margin: 22px 0;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra-forte);
   max-height: 320px;
 }
 .midia-moldura img, .midia-moldura video { display: block; width: 100%; max-height: 320px; object-fit: cover; }
@@ -312,12 +197,12 @@ html { overflow-x: hidden; }
 .midia-placeholder {
   display: flex; align-items: center; justify-content: center;
   min-height: 160px; padding: 24px;
-  background: repeating-linear-gradient(135deg, var(--destaque-suave) 0 10px, rgba(0,75,163,0.14) 10px 20px);
-  color: var(--tinta-suave); font-family: var(--fonte-corpo); text-align: center; line-height: 1.5;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,0.14) 0 10px, rgba(255,255,255,0.22) 10px 20px);
+  color: #fff; font-family: var(--fonte-corpo); text-align: center; line-height: 1.5;
 }
 .midia-placeholder span { font-size: 12.5px; max-width: 260px; }
 
-.midia-legenda { text-align: center; font-family: var(--fonte-corpo); font-style: italic; font-size: 14px; color: var(--tinta-suave); margin-top: -14px; margin-bottom: 20px; }
+.midia-legenda { text-align: center; font-family: var(--fonte-corpo); font-style: italic; font-size: 13.5px; color: rgba(255,255,255,0.78); margin-top: -12px; margin-bottom: 20px; }
 
 .midia-som-btn {
   position: absolute; bottom: 12px; right: 12px;
@@ -330,29 +215,47 @@ html { overflow-x: hidden; }
 .mini-galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 22px; }
 .mini-galeria img { width: 100%; height: 80px; object-fit: cover; border-radius: 10px; }
 
-.detalhes-grade {
-  display: flex; flex-direction: column; margin-bottom: 22px; position: relative; z-index: 1;
-  border-top: 1px solid #ece6d9;
+/* painel "vidro" — cartão translúcido sobre o vídeo/foto de fundo */
+.detalhes-grade.vidro {
+  display: flex; flex-direction: column;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-suave);
+  margin-bottom: 22px;
+  overflow: hidden;
 }
-.detalhe-item { text-align: center; padding: 16px 0; border-bottom: 1px solid #ece6d9; }
-.detalhe-item .rotulo { font-family: var(--fonte-corpo); font-size: 10.5px; letter-spacing: 2px; font-weight: 600; color: var(--tinta-suave); }
-.detalhe-item .valor { font-size: 19px; font-weight: 600; color: var(--tinta); line-height: 1.3; font-family: var(--fonte-corpo); margin-top: 4px; }
-.detalhe-item .sub { font-size: 14px; color: var(--tinta-suave); margin-top: 1px; }
+.detalhe-item { text-align: center; padding: 18px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.18); }
+.detalhe-item:last-child { border-bottom: none; }
+.detalhe-item .rotulo { font-family: var(--fonte-corpo); font-size: 10.5px; letter-spacing: 2px; font-weight: 600; color: rgba(255,255,255,0.75); }
+.detalhe-item .valor { font-size: 19px; font-weight: 600; color: #fff; line-height: 1.3; font-family: var(--fonte-corpo); margin-top: 4px; }
+.detalhe-item .sub { font-size: 14px; color: rgba(255,255,255,0.75); margin-top: 1px; }
+.detalhe-item .btn-traje { margin-top: 12px; }
 
-.contagem-regressiva { display: flex; justify-content: center; gap: 10px; margin: 6px 0 24px; position: relative; z-index: 1; }
-.contagem-item { background: var(--destaque-suave); border-radius: 14px; padding: 10px 6px; min-width: 58px; text-align: center; }
-.contagem-item .n { font-family: var(--fonte-titulo); font-size: 20px; font-weight: 400; color: var(--destaque); display: block; }
-.contagem-item .l { font-family: var(--fonte-corpo); font-size: 8.5px; letter-spacing: 1px; color: var(--tinta-suave); }
+.contagem-regressiva { display: flex; justify-content: center; gap: 10px; margin: 6px 0 24px; }
+.contagem-item {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px; padding: 10px 6px; min-width: 58px; text-align: center;
+}
+.contagem-item .n { font-family: var(--fonte-titulo); font-size: 20px; font-weight: 400; color: #fff; display: block; }
+.contagem-item .l { font-family: var(--fonte-corpo); font-size: 8.5px; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
 .contagem-hoje { padding: 10px 18px; }
 .contagem-hoje .n { font-size: 14px; letter-spacing: 1.5px; font-family: var(--fonte-corpo); font-weight: 700; }
 
 .aviso-extra {
-  background: var(--destaque-suave); border-radius: 14px; padding: 14px 16px;
-  margin-bottom: 22px; text-align: left; font-size: 14.5px; color: var(--tinta-suave);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px; padding: 14px 16px;
+  margin-bottom: 22px; text-align: left; font-size: 14.5px; color: rgba(255,255,255,0.85);
 }
-.aviso-extra strong { color: var(--tinta); display: block; font-size: 12px; letter-spacing: 0.3px; margin-bottom: 4px; }
+.aviso-extra strong { color: #fff; display: block; font-size: 12px; letter-spacing: 0.3px; margin-bottom: 4px; }
 
-.botoes-carta { display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
+.botoes-carta { display: flex; flex-direction: column; gap: 10px; }
 
 /* ============================== BOTÕES (arredondados) ===================== */
 .btn {
@@ -372,9 +275,20 @@ html { overflow-x: hidden; }
 .btn-ouro { background: transparent; color: var(--destaque); border: 1.5px solid var(--destaque); }
 .btn-ouro:hover { background: var(--destaque-suave); }
 .btn-bloco { width: 100%; }
+.btn-pequeno { padding: 10px 20px; font-size: 11.5px; }
+
+/* nas etapas com vídeo de fundo (capa/detalhes), o botão secundário precisa
+   de contraste claro em vez do estilo pensado para o papel */
+.capa-etapa .btn-secundario,
+.detalhes-etapa .btn-secundario {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+.capa-etapa .btn-secundario:hover,
+.detalhes-etapa .btn-secundario:hover { background: rgba(255, 255, 255, 0.12); }
 
 /* ============================== FORMULÁRIO ================================= */
-.form-papel { background: var(--papel); border-radius: var(--raio-card); box-shadow: var(--sombra-forte); padding: 36px 28px; position: relative; }
+.form-papel { background: var(--papel); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--raio-card); box-shadow: var(--sombra-forte); padding: 36px 28px; position: relative; }
 
 .campo { margin-bottom: 20px; }
 .campo label { display: block; font-family: var(--fonte-corpo); font-size: 11.5px; font-weight: 600; letter-spacing: 0.4px; color: var(--tinta); margin-bottom: 8px; }
@@ -400,7 +314,7 @@ html { overflow-x: hidden; }
   display: flex; align-items: center; justify-content: center;
   box-shadow: var(--sombra-suave);
 }
-.card-confirmacao { background: var(--papel); border-radius: var(--raio-card); box-shadow: var(--sombra-forte); padding: 30px 26px; margin-bottom: 22px; text-align: left; }
+.card-confirmacao { background: var(--papel); border: 1px solid rgba(0,0,0,0.06); border-radius: var(--raio-card); box-shadow: var(--sombra-forte); padding: 30px 26px; margin-bottom: 22px; text-align: left; }
 .resumo-item { padding: 14px 0; border-bottom: 1px solid #ece6d9; }
 .resumo-item:last-child { border-bottom: none; padding-bottom: 0; }
 .resumo-item .rotulo { font-family: var(--fonte-corpo); font-size: 10.5px; letter-spacing: 1.5px; font-weight: 600; color: var(--tinta-suave); margin-bottom: 4px; }
@@ -417,6 +331,8 @@ html { overflow-x: hidden; }
 .rodape-contato { margin-top: 22px; color: rgba(255,255,255,0.75); font-family: var(--fonte-corpo); font-size: 12px; letter-spacing: 0.3px; }
 .rodape-contato a { color: #fff; text-decoration: none; margin: 0 6px; }
 .rodape-contato a:hover { text-decoration: underline; }
+body.pagina-solida .rodape-contato { color: var(--tinta-suave); }
+body.pagina-solida .rodape-contato a { color: var(--tinta); }
 
 .status-envio { margin-top: 16px; font-family: var(--fonte-corpo); font-size: 11.5px; letter-spacing: 0.3px; color: var(--tinta-suave); }
 
@@ -428,9 +344,8 @@ html { overflow-x: hidden; }
 @media (max-width: 480px) {
   .linha-form { grid-template-columns: 1fr; }
   .links-rapidos { grid-template-columns: 1fr; }
-  .carta-titulo { font-size: 30px; }
+  .capa-titulo { font-size: 34px; }
   .cabecalho-etapa h2 { font-size: 25px; }
-  .carta-papel { --carta-pad-x: 20px; padding-left: var(--carta-pad-x); padding-right: var(--carta-pad-x); padding-top: 28px; }
   .form-papel, .card-confirmacao { padding: 28px 20px; }
 }
 
