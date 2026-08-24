@@ -1,5 +1,12 @@
 # Convite Solua — Configurável (Cloudflare Worker)
 
+**Publicado em:** https://convite.gruposolua.workers.dev
+**Painel administrativo:** https://convite.gruposolua.workers.dev/admin
+(usuário `admin`, senha inicial `solua14anos` — troque em Segurança)
+
+> Se um domínio próprio (ex. `convites.gruposolua.com.br`) for adicionado
+> depois em Settings → Domains & Routes, atualize os links acima.
+
 Convite digital em 3 etapas: **capa** em vídeo (ou foto) de tela cheia com
 botão de confirmar presença, **página de detalhes** com o mesmo vídeo de
 fundo (data/hora, local, traje e contagem regressiva) e **formulário** com
