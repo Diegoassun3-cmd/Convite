@@ -112,12 +112,76 @@ app.post('/api/admin/upload/:categoria', async (c) => {
 // ---------------------------------------------------------------------
 // Arquivos enviados (servidos a partir do KV)
 // ---------------------------------------------------------------------
+// Vídeos precisam de suporte a "Range" (bytes parciais) — sem isso, o
+// navegador só consegue começar a tocar depois de baixar o arquivo
+// inteiro (por isso a demora de dezenas de segundos antes de o vídeo
+// aparecer). Com Range, ele consegue buscar só o pedaço inicial (e o
+// índice de metadados do vídeo, geralmente no fim do arquivo) e já
+// começa a reproduzir. Também cacheia na borda da Cloudflare, para que
+// visitas seguintes nem precisem buscar de novo no KV.
 app.get('/uploads/:pasta/:nome', async (c) => {
+  const cache = caches.default;
+  const chaveCache = new Request(c.req.url, { method: 'GET' });
+
+  const emCache = await cache.match(chaveCache);
+  if (emCache) return respostaComRange(emCache, c.req.header('Range'));
+
   const resultado = await lerUpload(c.env.KV, `${c.req.param('pasta')}/${c.req.param('nome')}`);
   if (!resultado) return c.notFound();
-  c.header('Content-Type', resultado.contentType);
-  c.header('Cache-Control', 'public, max-age=604800, immutable');
-  return c.body(resultado.data);
+
+  const respostaCompleta = new Response(resultado.data, {
+    status: 200,
+    headers: {
+      'Content-Type': resultado.contentType,
+      'Content-Length': String(resultado.data.byteLength),
+      'Cache-Control': 'public, max-age=604800, immutable',
+      'Accept-Ranges': 'bytes',
+    },
+  });
+  c.executionCtx.waitUntil(cache.put(chaveCache, respostaCompleta.clone()));
+
+  return respostaComRange(respostaCompleta, c.req.header('Range'));
 });
+
+/** Recorta a resposta completa conforme o cabeçalho Range, se houver. */
+async function respostaComRange(resposta, rangeHeader) {
+  if (!rangeHeader) return resposta;
+
+  const buffer = await resposta.clone().arrayBuffer();
+  const tamanhoTotal = buffer.byteLength;
+  const match = /bytes=(\d*)-(\d*)/.exec(rangeHeader);
+  if (!match) return resposta;
+
+  let inicio, fim;
+  if (match[1] === '') {
+    // "bytes=-500" (sem início) = os últimos 500 bytes do arquivo — é
+    // assim que o navegador busca o índice/metadados do vídeo, que em
+    // muitos MP4s fica no final do arquivo.
+    const sufixo = parseInt(match[2], 10);
+    if (isNaN(sufixo) || sufixo <= 0) return resposta;
+    inicio = Math.max(0, tamanhoTotal - sufixo);
+    fim = tamanhoTotal - 1;
+  } else {
+    inicio = parseInt(match[1], 10);
+    fim = match[2] ? parseInt(match[2], 10) : tamanhoTotal - 1;
+  }
+  if (isNaN(inicio) || inicio < 0) inicio = 0;
+  if (isNaN(fim) || fim >= tamanhoTotal) fim = tamanhoTotal - 1;
+  if (inicio > fim) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${tamanhoTotal}` } });
+  }
+
+  const fatia = buffer.slice(inicio, fim + 1);
+  return new Response(fatia, {
+    status: 206,
+    headers: {
+      'Content-Type': resposta.headers.get('Content-Type') || 'application/octet-stream',
+      'Content-Range': `bytes ${inicio}-${fim}/${tamanhoTotal}`,
+      'Content-Length': String(fatia.byteLength),
+      'Cache-Control': 'public, max-age=604800, immutable',
+      'Accept-Ranges': 'bytes',
+    },
+  });
+}
 
 export default app;
