@@ -59,12 +59,11 @@ export default {
     galeria: [],
   },
 
-  // Vídeo (ou foto) de fundo em tela cheia, usado tanto na capa quanto na
-  // página de detalhes — o mesmo arquivo aparece nas duas, só o texto muda.
+  // Vídeo de fundo em tela cheia — o mesmo arquivo aparece em todas as
+  // etapas do convite (capa, detalhes, formulário e confirmação), só o
+  // texto muda entre elas. Sempre vídeo, sem opção de foto.
   fundoTelaCheia: {
     ativo: true,
-    tipo: "video", // "foto" | "video"
-    fotoUrl: "",
     videoUrl: "",
     videoMudo: true,
     videoLoop: true,

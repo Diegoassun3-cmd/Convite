@@ -10,7 +10,6 @@ export const CATEGORIAS = {
   'foto-cartao': { pasta: 'midia', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 10 * 1024 * 1024 },
   'video-cartao': { pasta: 'midia', tipos: /^video\/(mp4|webm|quicktime)$/, tamanhoMax: 23 * 1024 * 1024 },
   'poster-cartao': { pasta: 'midia', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 10 * 1024 * 1024 },
-  'fundo-foto': { pasta: 'fundo', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 12 * 1024 * 1024 },
   'fundo-video': { pasta: 'fundo', tipos: /^video\/(mp4|webm|quicktime)$/, tamanhoMax: 23 * 1024 * 1024 },
   galeria: { pasta: 'galeria', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 10 * 1024 * 1024 },
 };

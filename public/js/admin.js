@@ -15,7 +15,6 @@
     'foto-cartao': 'midiaCartao.fotoUrl',
     'video-cartao': 'midiaCartao.videoUrl',
     'poster-cartao': 'midiaCartao.videoPoster',
-    'fundo-foto': 'fundoTelaCheia.fotoUrl',
     'fundo-video': 'fundoTelaCheia.videoUrl',
   };
   const CATEGORIA_PREVIEW = {
@@ -23,18 +22,24 @@
     'foto-cartao': { preview: 'preview-midia-foto', nome: 'nome-midia-foto', tipo: 'img' },
     'video-cartao': { preview: 'preview-midia-video', nome: 'nome-midia-video', tipo: 'video' },
     'poster-cartao': { preview: 'preview-midia-poster', nome: 'nome-midia-poster', tipo: 'img' },
-    'fundo-foto': { preview: 'preview-fundo-foto', nome: 'nome-fundo-foto', tipo: 'img' },
     'fundo-video': { preview: 'preview-fundo-video', nome: 'nome-fundo-video', tipo: 'video' },
   };
   // Espelha os limites de src/upload.js — checar aqui ANTES de enviar evita
-  // fazer o convidado/admin esperar o upload inteiro (podendo levar minutos
-  // numa conexão mais lenta) só para descobrir, no final, que o arquivo era
-  // grande demais.
+  // fazer o admin esperar o upload inteiro (podendo levar bastante tempo
+  // numa conexão mais lenta) só para descobrir, no final, que o arquivo
+  // era grande demais.
   const LIMITE_MB_CATEGORIA = {
     logo: 4, 'foto-cartao': 10, 'video-cartao': 23, 'poster-cartao': 10,
-    'fundo-foto': 12, 'fundo-video': 23, galeria: 10,
+    'fundo-video': 23, galeria: 10,
   };
-  const TEMPO_LIMITE_UPLOAD_MS = 120000; // 2min — evita ficar "carregando" pra sempre
+  // Tempo-limite escalado pelo tamanho do arquivo (piso de 2min, teto de
+  // 60min) — arquivos de até 1GB podem legitimamente demorar numa conexão
+  // mais lenta, mas isso evita ficar "carregando" pra sempre se travar de
+  // verdade. Assume uma velocidade mínima aceitável de ~200KB/s.
+  function tempoLimiteUpload(tamanhoBytes) {
+    const estimadoMs = (tamanhoBytes / (200 * 1024)) * 1000;
+    return Math.min(60 * 60000, Math.max(120000, estimadoMs));
+  }
 
   // ------------------------------------------------------------------
   // utilidades de caminho (dot-path) em objetos aninhados
@@ -120,10 +125,6 @@
     $('select-midia-tipo').value = tipoMidia;
     alternarBlocoMidia(tipoMidia);
 
-    const tipoFundo = (cfg.fundoTelaCheia && cfg.fundoTelaCheia.tipo) || 'foto';
-    $('select-fundo-tipo').value = tipoFundo;
-    alternarBlocoFundo(tipoFundo);
-
     const overlay = (cfg.fundoTelaCheia && cfg.fundoTelaCheia.opacidadeOverlay) != null ? cfg.fundoTelaCheia.opacidadeOverlay : 0.55;
     $('range-overlay').value = overlay;
     $('valor-overlay').textContent = Math.round(overlay * 100) + '%';
@@ -155,12 +156,6 @@
     $('bloco-midia-video').classList.toggle('oculto', tipo !== 'video');
   }
   $('select-midia-tipo').addEventListener('change', (e) => alternarBlocoMidia(e.target.value));
-
-  function alternarBlocoFundo(tipo) {
-    $('bloco-fundo-foto').classList.toggle('oculto', tipo !== 'foto');
-    $('bloco-fundo-video').classList.toggle('oculto', tipo !== 'video');
-  }
-  $('select-fundo-tipo').addEventListener('change', (e) => alternarBlocoFundo(e.target.value));
 
   $('range-overlay').addEventListener('input', (e) => {
     $('valor-overlay').textContent = Math.round(Number(e.target.value) * 100) + '%';
@@ -206,7 +201,7 @@
 
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `/api/admin/upload/${categoria}`);
-      xhr.timeout = TEMPO_LIMITE_UPLOAD_MS;
+      xhr.timeout = tempoLimiteUpload(arquivo.size);
 
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable && aoProgredir) aoProgredir(Math.round((e.loaded / e.total) * 100));

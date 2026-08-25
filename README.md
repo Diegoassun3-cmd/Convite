@@ -10,15 +10,20 @@
 > Se um domínio próprio (ex. `convites.gruposolua.com.br`) for adicionado
 > depois em Settings → Domains & Routes, atualize os links acima.
 
-Convite digital em 3 etapas: **capa** em vídeo (ou foto) de tela cheia com
-botão de confirmar presença, **página de detalhes** com o mesmo vídeo de
-fundo (data/hora, local, traje e contagem regressiva) e **formulário** com
-fundo sólido. O painel em `/admin` configura tudo (textos, cores, fotos,
-vídeos, formulário) e lista as confirmações recebidas.
+Convite digital em 4 etapas — **capa**, **página de detalhes** (data/hora,
+local, traje e contagem regressiva), **formulário** e **confirmação** —
+todas com o mesmo vídeo de fundo em tela cheia, só o texto muda entre
+elas. O painel em `/admin` configura tudo (textos, cores, fotos, vídeos,
+formulário) e lista as confirmações recebidas.
 
 Roda inteiramente na Cloudflare: **Workers** (backend), **D1** (banco de
 dados) e **KV** (fotos/vídeos enviados + limite de tentativas de RSVP).
-Sem servidor Node para manter no ar, sem precisar habilitar R2.
+Sem servidor Node para manter no ar.
+
+> ⚠️ Fotos/vídeos são guardados no KV, que tem um teto rígido de ~23MB por
+> arquivo. Uma migração para R2 (suportando até ~1GB) está pronta no código
+> mas ainda não publicada — depende do R2 ser ativado na conta Cloudflare
+> primeiro (Storage & Databases → R2 → Enable R2).
 
 ## Recursos já provisionados nesta conta
 
@@ -58,10 +63,10 @@ npm run dev
 - **Evento**: textos, data/hora real, local, link do mapa, dress code, prazo.
 - **Marca e logo**: upload do logo (página de detalhes e painel) ou monograma.
 - **Aparência**: cores, textura de papel (formulário/confirmação), botões arredondados.
-- **Vídeo/foto de capa**: cobre a tela toda na capa **e** na página de
-  detalhes (é o mesmo arquivo nas duas, só o texto muda).
+- **Vídeo de capa**: cobre a tela toda em todas as etapas do convite (é
+  sempre o mesmo arquivo, sem opção de foto).
 - **Mídia da página de detalhes**: foto **ou vídeo** dentro de uma moldura
-  (até 18MB), com legenda, poster, autoplay/loop/mudo, e uma mini galeria.
+  (até 23MB), com legenda, poster, autoplay/loop/mudo, e uma mini galeria.
 - **Traje**: texto do dress code + link opcional que vira um botão.
 - **Formulário (RSVP)**: ativa/obriga cada campo, limite de acompanhantes,
   pergunta extra livre.

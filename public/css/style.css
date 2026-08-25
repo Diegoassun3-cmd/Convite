@@ -41,8 +41,8 @@ body {
 }
 html { overflow-x: hidden; }
 
-/* fundo padrão — azul sólido da marca (capa/detalhes) ou papel sólido
-   (formulário/confirmação), conforme a etapa atual */
+/* fundo padrão — azul sólido da marca, atrás do vídeo (visível só até o
+   vídeo carregar, ou se nenhum vídeo estiver configurado) */
 .fundo-padrao {
   position: fixed;
   inset: 0;
@@ -50,12 +50,10 @@ html { overflow-x: hidden; }
   background:
     radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.08), transparent 55%),
     linear-gradient(160deg, var(--fundo-1) 0%, var(--fundo-2) 100%);
-  transition: background 0.5s ease;
 }
-body.pagina-solida .fundo-padrao { background: var(--papel); }
 
-/* fundo em tela cheia configurável (foto ou vídeo) — mostrado na capa e na
-   página de detalhes, atrás do conteúdo */
+/* vídeo de fundo em tela cheia — o mesmo em todas as etapas do convite,
+   atrás do conteúdo */
 .fundo-tela-cheia {
   position: fixed;
   inset: 0;
@@ -331,8 +329,6 @@ body.pagina-solida .fundo-padrao { background: var(--papel); }
 .rodape-contato { margin-top: 22px; color: rgba(255,255,255,0.75); font-family: var(--fonte-corpo); font-size: 12px; letter-spacing: 0.3px; }
 .rodape-contato a { color: #fff; text-decoration: none; margin: 0 6px; }
 .rodape-contato a:hover { text-decoration: underline; }
-body.pagina-solida .rodape-contato { color: var(--tinta-suave); }
-body.pagina-solida .rodape-contato a { color: var(--tinta); }
 
 .status-envio { margin-top: 16px; font-family: var(--fonte-corpo); font-size: 11.5px; letter-spacing: 0.3px; color: var(--tinta-suave); }
 

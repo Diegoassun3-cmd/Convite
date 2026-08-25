@@ -46,7 +46,7 @@
   }
 
   // ------------------------------------------------------------------
-  // 2. Fundo em tela cheia (foto ou vídeo) — capa e página de detalhes
+  // 2. Vídeo de fundo em tela cheia — o mesmo em todas as etapas
   // ------------------------------------------------------------------
   function montarFundoTelaCheia() {
     const f = CFG.fundoTelaCheia || {};
@@ -54,25 +54,12 @@
     if (!container) return;
     document.documentElement.style.setProperty('--overlay-opacidade', f.opacidadeOverlay != null ? f.opacidadeOverlay : 0.55);
 
-    if (!f.ativo) { container.innerHTML = ''; return; }
+    if (!f.ativo || !f.videoUrl) { container.innerHTML = ''; return; }
 
-    if (f.tipo === 'video' && f.videoUrl) {
-      container.innerHTML = `<video autoplay loop playsinline ${f.videoMudo === false ? '' : 'muted'} src="${escaparHtml(f.videoUrl)}"></video><div class="fundo-overlay"></div>`;
-      const video = container.querySelector('video');
-      if (video) video.play().catch(() => {});
-    } else if (f.tipo === 'foto' && f.fotoUrl) {
-      container.innerHTML = `<img src="${escaparHtml(f.fotoUrl)}" alt="">` + '<div class="fundo-overlay"></div>';
-    } else {
-      container.innerHTML = '';
-    }
-  }
-
-  function ativarFundoTelaCheia(ativar) {
-    const f = CFG.fundoTelaCheia || {};
-    const container = $('fundo-tela-cheia');
-    if (!container) return;
-    const temMidia = f.ativo && ((f.tipo === 'foto' && f.fotoUrl) || (f.tipo === 'video' && f.videoUrl));
-    container.classList.toggle('ativo', !!(ativar && temMidia));
+    container.innerHTML = `<video autoplay ${f.videoLoop === false ? '' : 'loop'} playsinline ${f.videoMudo === false ? '' : 'muted'} src="${escaparHtml(f.videoUrl)}"></video><div class="fundo-overlay"></div>`;
+    const video = container.querySelector('video');
+    if (video) video.play().catch(() => {});
+    container.classList.add('ativo');
   }
 
   // ------------------------------------------------------------------
@@ -293,13 +280,9 @@
   // 8. Navegação entre etapas
   // ------------------------------------------------------------------
   const etapas = ['etapa-capa', 'etapa-detalhes', 'etapa-form', 'etapa-confirmacao'];
-  const ETAPAS_COM_VIDEO = ['etapa-capa', 'etapa-detalhes'];
 
   function mostrarEtapa(id) {
     etapas.forEach((e) => { $(e).classList.toggle('oculto', e !== id); });
-    const usaVideo = ETAPAS_COM_VIDEO.indexOf(id) !== -1;
-    document.body.classList.toggle('pagina-solida', !usaVideo);
-    ativarFundoTelaCheia(usaVideo);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

@@ -216,49 +216,26 @@
       <!-- ---------------- FUNDO TELA CHEIA ---------------- -->
       <section class="painel" data-painel="fundo">
         <div class="secao">
-          <h2>Vídeo (ou foto) de capa</h2>
-          <p class="descricao">Preenche toda a tela na capa e na página de detalhes — é o mesmo arquivo nas duas, só o texto muda entre elas.</p>
+          <h2>Vídeo de capa</h2>
+          <p class="descricao">Preenche toda a tela em todas as etapas do convite (capa, detalhes, formulário e confirmação) — sempre o mesmo vídeo, só o texto muda entre elas.</p>
           <div class="linha-toggle">
-            <div class="txt"><strong>Ativar vídeo/foto de capa</strong></div>
+            <div class="txt"><strong>Ativar vídeo de capa</strong></div>
             <input type="checkbox" class="chave" data-path="fundoTelaCheia.ativo">
           </div>
-          <div class="campo">
-            <label>Tipo</label>
-            <select data-path="fundoTelaCheia.tipo" id="select-fundo-tipo">
-              <option value="foto">Foto</option>
-              <option value="video">Vídeo</option>
-            </select>
-          </div>
 
-          <div id="bloco-fundo-foto">
-            <div class="upload-area">
-              <div class="upload-preview" id="preview-fundo-foto"></div>
-              <div class="upload-info">
-                <div class="upload-acoes">
-                  <button type="button" class="btn btn-secundario btn-pequeno" data-abrir-upload="fundo-foto">ENVIAR FOTO DE FUNDO</button>
-                  <button type="button" class="btn btn-fantasma btn-pequeno" data-limpar="fundoTelaCheia.fotoUrl">REMOVER</button>
-                </div>
-                <div class="nome-arquivo" id="nome-fundo-foto">Nenhuma foto enviada</div>
+          <div class="upload-area">
+            <div class="upload-preview" id="preview-fundo-video"></div>
+            <div class="upload-info">
+              <div class="upload-acoes">
+                <button type="button" class="btn btn-secundario btn-pequeno" data-abrir-upload="fundo-video">ENVIAR VÍDEO DE FUNDO</button>
+                <button type="button" class="btn btn-fantasma btn-pequeno" data-limpar="fundoTelaCheia.videoUrl">REMOVER</button>
               </div>
-              <input type="file" class="input-arquivo-oculto" data-input-upload="fundo-foto" accept="image/png,image/jpeg,image/webp">
+              <div class="nome-arquivo" id="nome-fundo-video">Nenhum vídeo enviado</div>
             </div>
+            <input type="file" class="input-arquivo-oculto" data-input-upload="fundo-video" accept="video/mp4,video/webm,video/quicktime">
           </div>
-
-          <div id="bloco-fundo-video" class="oculto">
-            <div class="upload-area">
-              <div class="upload-preview" id="preview-fundo-video"></div>
-              <div class="upload-info">
-                <div class="upload-acoes">
-                  <button type="button" class="btn btn-secundario btn-pequeno" data-abrir-upload="fundo-video">ENVIAR VÍDEO DE FUNDO</button>
-                  <button type="button" class="btn btn-fantasma btn-pequeno" data-limpar="fundoTelaCheia.videoUrl">REMOVER</button>
-                </div>
-                <div class="nome-arquivo" id="nome-fundo-video">Nenhum vídeo enviado</div>
-              </div>
-              <input type="file" class="input-arquivo-oculto" data-input-upload="fundo-video" accept="video/mp4,video/webm,video/quicktime">
-            </div>
-            <div class="linha-toggle"><div class="txt"><strong>Iniciar mudo</strong></div><input type="checkbox" class="chave" data-path="fundoTelaCheia.videoMudo"></div>
-            <div class="linha-toggle"><div class="txt"><strong>Repetir (loop)</strong></div><input type="checkbox" class="chave" data-path="fundoTelaCheia.videoLoop"></div>
-          </div>
+          <div class="linha-toggle"><div class="txt"><strong>Iniciar mudo</strong></div><input type="checkbox" class="chave" data-path="fundoTelaCheia.videoMudo"></div>
+          <div class="linha-toggle"><div class="txt"><strong>Repetir (loop)</strong></div><input type="checkbox" class="chave" data-path="fundoTelaCheia.videoLoop"></div>
 
           <div class="campo" style="margin-top:8px;">
             <label>Escurecimento sobre o fundo (para manter a leitura): <span id="valor-overlay">55%</span></label>
