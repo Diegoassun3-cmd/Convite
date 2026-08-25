@@ -26,6 +26,15 @@
     'fundo-foto': { preview: 'preview-fundo-foto', nome: 'nome-fundo-foto', tipo: 'img' },
     'fundo-video': { preview: 'preview-fundo-video', nome: 'nome-fundo-video', tipo: 'video' },
   };
+  // Espelha os limites de src/upload.js — checar aqui ANTES de enviar evita
+  // fazer o convidado/admin esperar o upload inteiro (podendo levar minutos
+  // numa conexão mais lenta) só para descobrir, no final, que o arquivo era
+  // grande demais.
+  const LIMITE_MB_CATEGORIA = {
+    logo: 4, 'foto-cartao': 10, 'video-cartao': 23, 'poster-cartao': 10,
+    'fundo-foto': 12, 'fundo-video': 23, galeria: 10,
+  };
+  const TEMPO_LIMITE_UPLOAD_MS = 120000; // 2min — evita ficar "carregando" pra sempre
 
   // ------------------------------------------------------------------
   // utilidades de caminho (dot-path) em objetos aninhados
@@ -186,13 +195,52 @@
     });
   });
 
+  // Envia via XMLHttpRequest (em vez de fetch) para termos progresso real de
+  // upload e um tempo-limite — assim, numa conexão lenta ou se o servidor
+  // travar, o usuário vê o andamento (ou um erro claro) em vez da tela
+  // "carregando" para sempre sem nenhuma pista do que está acontecendo.
+  function xhrUpload(categoria, arquivo, aoProgredir) {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('arquivo', arquivo);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `/api/admin/upload/${categoria}`);
+      xhr.timeout = TEMPO_LIMITE_UPLOAD_MS;
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && aoProgredir) aoProgredir(Math.round((e.loaded / e.total) * 100));
+      });
+      xhr.addEventListener('timeout', () => reject(new Error('O envio demorou demais e foi cancelado. Tente um arquivo menor ou uma conexão mais estável.')));
+      xhr.addEventListener('error', () => reject(new Error('Falha de rede durante o envio.')));
+      xhr.addEventListener('load', () => {
+        let dados;
+        try { dados = JSON.parse(xhr.responseText); } catch (e) { dados = null; }
+        if (xhr.status >= 200 && xhr.status < 300 && dados && dados.ok) resolve(dados);
+        else reject(new Error((dados && dados.erro) || `Falha no upload (HTTP ${xhr.status}).`));
+      });
+
+      xhr.send(formData);
+    });
+  }
+
   async function enviarArquivo(categoria, arquivo) {
-    const formData = new FormData();
-    formData.append('arquivo', arquivo);
+    const limiteMb = LIMITE_MB_CATEGORIA[categoria];
+    if (limiteMb && arquivo.size > limiteMb * 1024 * 1024) {
+      alert(`Esse arquivo tem ${(arquivo.size / (1024 * 1024)).toFixed(1)}MB — o máximo para essa categoria é ${limiteMb}MB. Escolha um arquivo menor.`);
+      return null;
+    }
+
+    const info = CATEGORIA_PREVIEW[categoria];
+    const nomeEl = info && $(info.nome);
+    const textoOriginal = nomeEl ? nomeEl.textContent : '';
+    const botao = document.querySelector(`[data-abrir-upload="${categoria}"]`);
+    if (botao) botao.disabled = true;
+
     try {
-      const r = await fetch(`/api/admin/upload/${categoria}`, { method: 'POST', body: formData });
-      const dados = await r.json();
-      if (!r.ok || !dados.ok) throw new Error(dados.erro || 'Falha no upload');
+      const dados = await xhrUpload(categoria, arquivo, (pct) => {
+        if (nomeEl) nomeEl.textContent = `Enviando… ${pct}%`;
+      });
 
       if (categoria === 'galeria') return dados.url;
 
@@ -207,7 +255,10 @@
       return dados.url;
     } catch (err) {
       alert('Erro no upload: ' + err.message);
+      if (nomeEl) nomeEl.textContent = textoOriginal;
       return null;
+    } finally {
+      if (botao) botao.disabled = false;
     }
   }
 

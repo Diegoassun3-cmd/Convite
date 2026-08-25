@@ -1,14 +1,17 @@
 // Categorias de upload — cada uma tem prefixo próprio no KV, tipos aceitos
 // e tamanho máximo. Guardado no KV (não usa R2 — evita precisar habilitar
-// R2 na conta Cloudflare). O KV aceita valores de até 25MB, por isso os
-// limites de vídeo são mais conservadores: prefira vídeos curtos e leves.
+// R2 na conta Cloudflare). O KV rejeita valores acima de 25MB, por isso os
+// limites de vídeo ficam em 23MB (uma margem de segurança abaixo do teto).
+// Os mesmos limites são checados no navegador antes do envio (admin.js),
+// para não fazer o usuário esperar o upload inteiro só pra descobrir no
+// final que o arquivo era grande demais.
 export const CATEGORIAS = {
   logo: { pasta: 'logo', tipos: /^image\/(png|jpeg|jpg|webp|svg\+xml)$/, tamanhoMax: 4 * 1024 * 1024 },
   'foto-cartao': { pasta: 'midia', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 10 * 1024 * 1024 },
-  'video-cartao': { pasta: 'midia', tipos: /^video\/(mp4|webm|quicktime)$/, tamanhoMax: 18 * 1024 * 1024 },
+  'video-cartao': { pasta: 'midia', tipos: /^video\/(mp4|webm|quicktime)$/, tamanhoMax: 23 * 1024 * 1024 },
   'poster-cartao': { pasta: 'midia', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 10 * 1024 * 1024 },
   'fundo-foto': { pasta: 'fundo', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 12 * 1024 * 1024 },
-  'fundo-video': { pasta: 'fundo', tipos: /^video\/(mp4|webm|quicktime)$/, tamanhoMax: 18 * 1024 * 1024 },
+  'fundo-video': { pasta: 'fundo', tipos: /^video\/(mp4|webm|quicktime)$/, tamanhoMax: 23 * 1024 * 1024 },
   galeria: { pasta: 'galeria', tipos: /^image\/(png|jpeg|jpg|webp)$/, tamanhoMax: 10 * 1024 * 1024 },
 };
 
