@@ -26,6 +26,13 @@ export default {
     avisoExtra: { ativo: false, titulo: "Observação", texto: "" },
   },
 
+  // Capa — por padrão mostra os textos (chamada/título/saudação) sobre o
+  // vídeo de fundo. Se uma imagem for enviada, ela substitui esses textos
+  // (o botão de confirmar presença continua aparecendo).
+  capa: {
+    imagemUrl: "",
+  },
+
   marca: {
     // Logo usado na capa, na página de detalhes e no painel administrativo.
     // Se vazio, usa um monograma com as iniciais abaixo.
@@ -83,8 +90,10 @@ export default {
     campos: {
       email: { ativo: true, obrigatorio: true },
       telefone: { ativo: true, obrigatorio: false },
-      empresa: { ativo: true, obrigatorio: false },
-      acompanhantes: { ativo: true, obrigatorio: true, maximo: 3 },
+      // maximo: 1 captura nome e telefone do acompanhante automaticamente
+      // (só funciona para 1 acompanhante — acima disso, só a quantidade é
+      // registrada, sem os dados individuais de cada um).
+      acompanhantes: { ativo: true, obrigatorio: true, maximo: 1 },
       restricoesAlimentares: { ativo: true, obrigatorio: false },
       perguntaExtra: { ativo: false, label: "", placeholder: "", obrigatorio: false },
     },
@@ -108,6 +117,5 @@ export default {
     contagemRegressiva: true,
     botaoAdicionarCalendario: true,
     botaoCompartilhar: true,
-    celebracaoAoConfirmar: true,
   },
 };

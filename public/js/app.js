@@ -56,10 +56,17 @@
 
     if (!f.ativo || !f.videoUrl) { container.innerHTML = ''; return; }
 
-    container.innerHTML = `<video autoplay ${f.videoLoop === false ? '' : 'loop'} playsinline ${f.videoMudo === false ? '' : 'muted'} src="${escaparHtml(f.videoUrl)}"></video><div class="fundo-overlay"></div>`;
+    container.innerHTML = `<video autoplay ${f.videoLoop === false ? '' : 'loop'} playsinline preload="auto" ${f.videoMudo === false ? '' : 'muted'} src="${escaparHtml(f.videoUrl)}"></video><div class="fundo-overlay"></div>`;
     const video = container.querySelector('video');
-    if (video) video.play().catch(() => {});
-    container.classList.add('ativo');
+    if (video) {
+      video.play().catch(() => {});
+      // só revela o vídeo (fade-in) quando já tem um frame pronto pra mostrar —
+      // evita a sensação de "demora" de um vídeo preto/travado aparecendo.
+      if (video.readyState >= 2) container.classList.add('ativo');
+      else video.addEventListener('loadeddata', () => container.classList.add('ativo'), { once: true });
+    } else {
+      container.classList.add('ativo');
+    }
   }
 
   // ------------------------------------------------------------------
@@ -81,6 +88,21 @@
     const convidado = nomeConvidado();
 
     // ---- capa ----
+    const capaImagem = (CFG.capa && CFG.capa.imagemUrl) || '';
+    const capaImagemEl = $('capa-imagem-container');
+    const capaTextoEl = $('capa-texto-container');
+    if (capaImagemEl && capaTextoEl) {
+      if (capaImagem) {
+        capaImagemEl.innerHTML = `<img src="${escaparHtml(capaImagem)}" alt="Convite">`;
+        capaImagemEl.classList.remove('oculto');
+        capaTextoEl.classList.add('oculto');
+      } else {
+        capaImagemEl.innerHTML = '';
+        capaImagemEl.classList.add('oculto');
+        capaTextoEl.classList.remove('oculto');
+      }
+    }
+
     if ($('txt-chamada')) $('txt-chamada').textContent = (ev.chamada || 'Você está convidado').toUpperCase();
     if ($('txt-capa-titulo')) $('txt-capa-titulo').textContent = ev.titulo || '';
     textoOuOculta('txt-capa-subtitulo', (ev.subtitulo || '').toUpperCase());
@@ -94,6 +116,7 @@
     // ---- detalhes ----
     const logoEl = $('carta-logo');
     if (logoEl) {
+      logoEl.classList.toggle('tem-imagem', !!marca.logoUrl);
       if (marca.logoUrl) logoEl.innerHTML = `<img src="${escaparHtml(marca.logoUrl)}" alt="${escaparHtml(marca.nome || 'Logo')}">`;
       else logoEl.textContent = marca.monograma || 'S';
     }
@@ -237,7 +260,6 @@
 
     aplicarCampo('grupo-email', 'campo-email', config('email'));
     aplicarCampo('grupo-telefone', 'campo-telefone', config('telefone'));
-    aplicarCampo('grupo-empresa', 'campo-empresa', config('empresa'));
     aplicarCampo('grupo-restricoes', 'campo-restricoes', config('restricoesAlimentares'));
 
     const acompCfg = config('acompanhantes');
@@ -245,11 +267,13 @@
     const selectAcomp = $('campo-acompanhantes');
     if (acompCfg.ativo === false) {
       grupoAcomp && grupoAcomp.classList.add('oculto');
+      $('linha-acompanhante-dados') && $('linha-acompanhante-dados').classList.add('oculto');
     } else if (selectAcomp) {
-      const max = acompCfg.maximo != null ? acompCfg.maximo : 3;
+      const max = acompCfg.maximo != null ? acompCfg.maximo : 1;
       selectAcomp.innerHTML = '<option value="">Selecione</option><option value="0">Apenas eu</option>' +
         Array.from({ length: max }, (_, i) => i + 1).map((n) => `<option value="${n}">+ ${n} acompanhante${n > 1 ? 's' : ''}</option>`).join('');
       if (acompCfg.obrigatorio) selectAcomp.required = true;
+      atualizarCamposAcompanhante();
     }
 
     const extraCfg = f.perguntaExtra || { ativo: false };
@@ -263,10 +287,25 @@
     }
 
     if (config('email').ativo === false && config('telefone').ativo === false) $('linha-email-tel') && $('linha-email-tel').classList.add('oculto');
-    if (config('empresa').ativo === false && acompCfg.ativo === false) $('linha-empresa-acomp') && $('linha-empresa-acomp').classList.add('oculto');
 
     const convidado = nomeConvidado();
     if (convidado && $('campo-nome')) $('campo-nome').value = convidado;
+  }
+
+  // Mostra/oculta e alterna "required" nos campos de nome/telefone do
+  // acompanhante, conforme a quantidade selecionada (só captura os dados
+  // quando pelo menos 1 acompanhante for escolhido).
+  function atualizarCamposAcompanhante() {
+    const select = $('campo-acompanhantes');
+    const linha = $('linha-acompanhante-dados');
+    const nomeCampo = $('campo-acompanhante-nome');
+    const telCampo = $('campo-acompanhante-telefone');
+    if (!select || !linha) return;
+    const mostrar = parseInt(select.value, 10) > 0;
+    linha.classList.toggle('oculto', !mostrar);
+    if (nomeCampo) nomeCampo.required = mostrar;
+    if (telCampo) telCampo.required = mostrar;
+    if (!mostrar) { if (nomeCampo) nomeCampo.value = ''; if (telCampo) telCampo.value = ''; }
   }
 
   function aplicarCampo(grupoId, campoId, cfgCampo) {
@@ -302,8 +341,9 @@
       nome: form.nome.value.trim(),
       email: form.email ? form.email.value.trim() : '',
       telefone: form.telefone ? form.telefone.value.trim() : '',
-      empresa: form.empresa ? form.empresa.value.trim() : '',
       acompanhantes: form.acompanhantes ? form.acompanhantes.value : '',
+      acompanhanteNome: form.acompanhanteNome ? form.acompanhanteNome.value.trim() : '',
+      acompanhanteTelefone: form.acompanhanteTelefone ? form.acompanhanteTelefone.value.trim() : '',
       restricoes: form.restricoes ? form.restricoes.value.trim() : '',
       extra: form.extra ? form.extra.value.trim() : '',
     };
@@ -333,7 +373,6 @@
 
     mostrarResumoConfirmacao(dados, statusMsg);
     mostrarEtapa('etapa-confirmacao');
-    if (CFG.recursos && CFG.recursos.celebracaoAoConfirmar) dispararConfete();
   }
 
   function mostrarResumoConfirmacao(dados, statusMsg) {
@@ -348,6 +387,14 @@
       $('resumo-acompanhantes') && ($('resumo-acompanhantes').textContent = n > 0 ? `Você + ${n} acompanhante(s)` : 'Apenas você');
     } else {
       $('resumo-acompanhantes-wrap') && $('resumo-acompanhantes-wrap').classList.add('oculto');
+    }
+
+    if (dados.acompanhanteNome) {
+      const dadosAcomp = dados.acompanhanteTelefone ? `${dados.acompanhanteNome} — ${dados.acompanhanteTelefone}` : dados.acompanhanteNome;
+      $('resumo-acompanhante-dados') && ($('resumo-acompanhante-dados').textContent = dadosAcomp);
+      $('resumo-acompanhante-dados-wrap') && $('resumo-acompanhante-dados-wrap').classList.remove('oculto');
+    } else {
+      $('resumo-acompanhante-dados-wrap') && $('resumo-acompanhante-dados-wrap').classList.add('oculto');
     }
 
     const linkMapa = $('link-mapa');
@@ -417,30 +464,6 @@
     }
   }
 
-  // ------------------------------------------------------------------
-  // 11. Confete leve na confirmação
-  // ------------------------------------------------------------------
-  function dispararConfete() {
-    const cores = [getComputedStyle(document.documentElement).getPropertyValue('--destaque').trim() || '#004BA3', '#F2EDE6', '#1c2733'];
-    for (let i = 0; i < 26; i++) {
-      const c = document.createElement('div');
-      c.className = 'confete';
-      c.style.left = Math.random() * 100 + 'vw';
-      c.style.background = cores[Math.floor(Math.random() * cores.length)];
-      c.style.animationDuration = 2.4 + Math.random() * 1.6 + 's';
-      c.style.opacity = String(0.6 + Math.random() * 0.4);
-      document.body.appendChild(c);
-      setTimeout(() => c.remove(), 4200);
-    }
-  }
-
-  // ------------------------------------------------------------------
-  // 12. Reset — nova confirmação
-  // ------------------------------------------------------------------
-  function resetarTudo() {
-    $('form-confirmar') && $('form-confirmar').reset();
-    mostrarEtapa('etapa-capa');
-  }
 
   // ------------------------------------------------------------------
   // Inicialização
@@ -462,11 +485,11 @@
     mostrarEtapa('etapa-capa');
 
     $('btn-confirmar-capa') && $('btn-confirmar-capa').addEventListener('click', irParaDetalhes);
+    $('campo-acompanhantes') && $('campo-acompanhantes').addEventListener('change', atualizarCamposAcompanhante);
     $('btn-ir-formulario') && $('btn-ir-formulario').addEventListener('click', () => mostrarEtapa('etapa-form'));
     $('btn-voltar-capa') && $('btn-voltar-capa').addEventListener('click', () => mostrarEtapa('etapa-capa'));
     $('btn-voltar-carta') && $('btn-voltar-carta').addEventListener('click', () => mostrarEtapa('etapa-detalhes'));
     $('form-confirmar') && $('form-confirmar').addEventListener('submit', handleSubmitForm);
-    $('btn-nova-confirmacao') && $('btn-nova-confirmacao').addEventListener('click', resetarTudo);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);

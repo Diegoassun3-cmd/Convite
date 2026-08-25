@@ -61,16 +61,21 @@ npm run dev
 ## O que dá para configurar pelo painel `/admin`
 
 - **Evento**: textos, data/hora real, local, link do mapa, dress code, prazo.
-- **Marca e logo**: upload do logo (página de detalhes e painel) ou monograma.
+- **Imagem da capa (opcional)**: se enviada, substitui os textos da capa
+  (chamada/título/saudação) por uma imagem — o vídeo de fundo continua atrás.
+- **Marca e logo**: upload do logo (página de detalhes e painel) ou monograma
+  — mostrado por inteiro, sem recorte circular — ou monograma.
 - **Aparência**: cores, textura de papel (formulário/confirmação), botões arredondados.
 - **Vídeo de capa**: cobre a tela toda em todas as etapas do convite (é
   sempre o mesmo arquivo, sem opção de foto).
 - **Mídia da página de detalhes**: foto **ou vídeo** dentro de uma moldura
   (até 23MB), com legenda, poster, autoplay/loop/mudo, e uma mini galeria.
-- **Traje**: texto do dress code + link opcional que vira um botão.
-- **Formulário (RSVP)**: ativa/obriga cada campo, limite de acompanhantes,
-  pergunta extra livre.
-- **Confirmações**: lista de quem confirmou, com exportação em CSV.
+- **Traje**: texto do dress code + link opcional que vira um botão (na
+  página de detalhes e na confirmação).
+- **Formulário (RSVP)**: ativa/obriga cada campo; ao selecionar +1
+  acompanhante, também captura nome e telefone dele.
+- **Confirmações**: lista de quem confirmou (com dados do acompanhante),
+  com exportação em CSV.
 - **Integrações**: webhook opcional, WhatsApp/Instagram/site.
 
 ## Estrutura

@@ -46,6 +46,22 @@
       <!-- ---------------- EVENTO ---------------- -->
       <section class="painel ativa" data-painel="evento">
         <div class="secao">
+          <h2>Imagem da capa (opcional)</h2>
+          <p class="descricao">Se enviada, substitui a chamada, o título e a saudação na capa por essa imagem (o vídeo de fundo e o botão de confirmar presença continuam aparecendo).</p>
+          <div class="upload-area">
+            <div class="upload-preview" id="preview-capa-imagem"></div>
+            <div class="upload-info">
+              <div class="upload-acoes">
+                <button type="button" class="btn btn-secundario btn-pequeno" data-abrir-upload="capa-imagem">ENVIAR IMAGEM</button>
+                <button type="button" class="btn btn-fantasma btn-pequeno" data-limpar="capa.imagemUrl">REMOVER</button>
+              </div>
+              <div class="nome-arquivo" id="nome-capa-imagem">Nenhuma imagem enviada — mostrando os textos</div>
+            </div>
+            <input type="file" class="input-arquivo-oculto" data-input-upload="capa-imagem" accept="image/png,image/jpeg,image/webp">
+          </div>
+        </div>
+
+        <div class="secao">
           <h2>Textos do convite</h2>
           <p class="descricao">O que aparece na capa e na página de detalhes.</p>
           <div class="grade-2">
@@ -261,11 +277,10 @@
 
           <div class="linha-toggle"><div class="txt"><strong>E-mail</strong></div><div style="display:flex;gap:18px;"><label><input type="checkbox" data-path="formulario.campos.email.ativo"> Ativo</label><label><input type="checkbox" data-path="formulario.campos.email.obrigatorio"> Obrigatório</label></div></div>
           <div class="linha-toggle"><div class="txt"><strong>Telefone</strong></div><div style="display:flex;gap:18px;"><label><input type="checkbox" data-path="formulario.campos.telefone.ativo"> Ativo</label><label><input type="checkbox" data-path="formulario.campos.telefone.obrigatorio"> Obrigatório</label></div></div>
-          <div class="linha-toggle"><div class="txt"><strong>Empresa</strong></div><div style="display:flex;gap:18px;"><label><input type="checkbox" data-path="formulario.campos.empresa.ativo"> Ativo</label><label><input type="checkbox" data-path="formulario.campos.empresa.obrigatorio"> Obrigatório</label></div></div>
           <div class="linha-toggle"><div class="txt"><strong>Restrições alimentares</strong></div><div style="display:flex;gap:18px;"><label><input type="checkbox" data-path="formulario.campos.restricoesAlimentares.ativo"> Ativo</label><label><input type="checkbox" data-path="formulario.campos.restricoesAlimentares.obrigatorio"> Obrigatório</label></div></div>
 
           <div class="linha-toggle">
-            <div class="txt"><strong>Acompanhantes</strong></div>
+            <div class="txt"><strong>Acompanhante</strong><span>Ao selecionar +1, o convidado também informa o nome e telefone do acompanhante</span></div>
             <div style="display:flex;gap:18px;align-items:center;">
               <label><input type="checkbox" data-path="formulario.campos.acompanhantes.ativo"> Ativo</label>
               <label><input type="checkbox" data-path="formulario.campos.acompanhantes.obrigatorio"> Obrigatório</label>
@@ -298,7 +313,6 @@
           <div class="linha-toggle"><div class="txt"><strong>Contagem regressiva</strong></div><input type="checkbox" class="chave" data-path="recursos.contagemRegressiva"></div>
           <div class="linha-toggle"><div class="txt"><strong>Botão "adicionar ao calendário"</strong></div><input type="checkbox" class="chave" data-path="recursos.botaoAdicionarCalendario"></div>
           <div class="linha-toggle"><div class="txt"><strong>Botão de compartilhar</strong></div><input type="checkbox" class="chave" data-path="recursos.botaoCompartilhar"></div>
-          <div class="linha-toggle"><div class="txt"><strong>Confete ao confirmar presença</strong></div><input type="checkbox" class="chave" data-path="recursos.celebracaoAoConfirmar"></div>
         </div>
       </section>
 
@@ -315,7 +329,7 @@
           <div class="tabela-wrap">
             <table class="tabela" id="tabela-confirmacoes">
               <thead>
-                <tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Acompanhantes</th><th>Restrições</th><th>Recebido em</th><th></th></tr>
+                <tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Acompanhantes</th><th>Dados do acompanhante</th><th>Restrições</th><th>Recebido em</th><th></th></tr>
               </thead>
               <tbody id="corpo-confirmacoes"></tbody>
             </table>

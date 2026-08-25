@@ -18,10 +18,13 @@
   <!-- ================= ETAPA 1: CAPA (vídeo/foto + confirmar) ================= -->
   <section class="etapa capa-etapa" id="etapa-capa">
     <div class="capa-conteudo">
-      <p class="chamada-inicial" id="txt-chamada">VOCÊ ESTÁ CONVIDADO</p>
-      <h1 class="capa-titulo" id="txt-capa-titulo">Título do Evento</h1>
-      <p class="capa-subtitulo" id="txt-capa-subtitulo">SUBTÍTULO</p>
-      <p class="capa-saudacao oculto" id="txt-capa-saudacao"></p>
+      <div id="capa-imagem-container" class="oculto"></div>
+      <div id="capa-texto-container">
+        <p class="chamada-inicial" id="txt-chamada">VOCÊ ESTÁ CONVIDADO</p>
+        <h1 class="capa-titulo" id="txt-capa-titulo">Título do Evento</h1>
+        <p class="capa-subtitulo" id="txt-capa-subtitulo">SUBTÍTULO</p>
+        <p class="capa-saudacao oculto" id="txt-capa-saudacao"></p>
+      </div>
       <button class="btn btn-primario btn-capa" id="btn-confirmar-capa" type="button">CONFIRMAR PRESENÇA</button>
     </div>
   </section>
@@ -96,16 +99,21 @@
         </div>
       </div>
 
-      <div class="linha-form" id="linha-empresa-acomp">
-        <div class="campo" id="grupo-empresa">
-          <label for="campo-empresa">EMPRESA</label>
-          <input type="text" id="campo-empresa" name="empresa" placeholder="Sua empresa">
+      <div class="campo" id="grupo-acompanhantes">
+        <label for="campo-acompanhantes">ACOMPANHANTE</label>
+        <select id="campo-acompanhantes" name="acompanhantes">
+          <option value="">Selecione</option>
+        </select>
+      </div>
+
+      <div class="linha-form oculto" id="linha-acompanhante-dados">
+        <div class="campo">
+          <label for="campo-acompanhante-nome">NOME DO ACOMPANHANTE</label>
+          <input type="text" id="campo-acompanhante-nome" name="acompanhanteNome" placeholder="Nome completo">
         </div>
-        <div class="campo" id="grupo-acompanhantes">
-          <label for="campo-acompanhantes">ACOMPANHANTES</label>
-          <select id="campo-acompanhantes" name="acompanhantes">
-            <option value="">Selecione</option>
-          </select>
+        <div class="campo">
+          <label for="campo-acompanhante-telefone">TELEFONE DO ACOMPANHANTE</label>
+          <input type="tel" id="campo-acompanhante-telefone" name="acompanhanteTelefone" placeholder="(11) 99999-9999">
         </div>
       </div>
 
@@ -128,9 +136,6 @@
 
   <!-- ================= ETAPA 4: CONFIRMAÇÃO (fundo sólido) ================= -->
   <section class="etapa confirmacao-etapa oculto" id="etapa-confirmacao">
-    <div class="selo-sucesso">
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M5 12.5 L10 17.5 L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
     <div class="cabecalho-etapa">
       <h2>PRESENÇA CONFIRMADA!</h2>
       <p id="txt-obrigado">Obrigado por confirmar</p>
@@ -149,6 +154,10 @@
         <div class="rotulo">ACOMPANHANTES</div>
         <div class="valor" id="resumo-acompanhantes">-</div>
       </div>
+      <div class="resumo-item oculto" id="resumo-acompanhante-dados-wrap">
+        <div class="rotulo">DADOS DO ACOMPANHANTE</div>
+        <div class="valor" id="resumo-acompanhante-dados">-</div>
+      </div>
 
       <div class="links-rapidos">
         <a href="#" class="link-card" id="link-mapa" target="_blank" rel="noopener">LOCAL DO EVENTO</a>
@@ -161,8 +170,6 @@
     </div>
 
     <div class="rodape-contato" id="rodape-contato"></div>
-
-    <button class="btn btn-ouro" id="btn-nova-confirmacao" type="button" style="margin-top:20px;">NOVA CONFIRMAÇÃO</button>
   </section>
 
 </div>

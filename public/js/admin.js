@@ -12,6 +12,7 @@
 
   const CATEGORIA_PATH = {
     logo: 'marca.logoUrl',
+    'capa-imagem': 'capa.imagemUrl',
     'foto-cartao': 'midiaCartao.fotoUrl',
     'video-cartao': 'midiaCartao.videoUrl',
     'poster-cartao': 'midiaCartao.videoPoster',
@@ -19,6 +20,7 @@
   };
   const CATEGORIA_PREVIEW = {
     logo: { preview: 'preview-logo', nome: 'nome-logo', tipo: 'img' },
+    'capa-imagem': { preview: 'preview-capa-imagem', nome: 'nome-capa-imagem', tipo: 'img' },
     'foto-cartao': { preview: 'preview-midia-foto', nome: 'nome-midia-foto', tipo: 'img' },
     'video-cartao': { preview: 'preview-midia-video', nome: 'nome-midia-video', tipo: 'video' },
     'poster-cartao': { preview: 'preview-midia-poster', nome: 'nome-midia-poster', tipo: 'img' },
@@ -29,7 +31,7 @@
   // numa conexão mais lenta) só para descobrir, no final, que o arquivo
   // era grande demais.
   const LIMITE_MB_CATEGORIA = {
-    logo: 4, 'foto-cartao': 10, 'video-cartao': 23, 'poster-cartao': 10,
+    logo: 4, 'capa-imagem': 10, 'foto-cartao': 10, 'video-cartao': 23, 'poster-cartao': 10,
     'fundo-video': 23, galeria: 10,
   };
   // Tempo-limite escalado pelo tamanho do arquivo (piso de 2min, teto de
@@ -373,11 +375,15 @@
         const data = new Date(r.dataEnvio);
         const dataFmt = isNaN(data.getTime()) ? '-' : data.toLocaleString('pt-BR');
         const acomp = r.acompanhantes === '' || r.acompanhantes == null ? '-' : r.acompanhantes;
+        const dadosAcomp = r.acompanhanteNome
+          ? `${r.acompanhanteNome}${r.acompanhanteTelefone ? ' — ' + r.acompanhanteTelefone : ''}`
+          : '-';
         return `<tr>
           <td>${escapar(r.nome)}</td>
           <td>${escapar(r.email || '-')}</td>
           <td>${escapar(r.telefone || '-')}</td>
           <td>${escapar(String(acomp))}</td>
+          <td>${escapar(dadosAcomp)}</td>
           <td>${escapar(r.restricoes || '-')}</td>
           <td>${dataFmt}</td>
           <td><button class="btn btn-perigo btn-pequeno" data-remover-rsvp="${r.id}">EXCLUIR</button></td>

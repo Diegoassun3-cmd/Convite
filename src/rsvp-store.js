@@ -9,8 +9,9 @@ function mapRow(r) {
     nome: r.nome,
     email: r.email || '',
     telefone: r.telefone || '',
-    empresa: r.empresa || '',
     acompanhantes: r.acompanhantes ?? '',
+    acompanhanteNome: r.acompanhante_nome || '',
+    acompanhanteTelefone: r.acompanhante_telefone || '',
     restricoes: r.restricoes || '',
     extra: r.extra || '',
   };
@@ -28,14 +29,15 @@ export async function adicionar(db, dados) {
     nome: dados.nome,
     email: dados.email || '',
     telefone: dados.telefone || '',
-    empresa: dados.empresa || '',
     acompanhantes: dados.acompanhantes ?? '',
+    acompanhanteNome: dados.acompanhanteNome || '',
+    acompanhanteTelefone: dados.acompanhanteTelefone || '',
     restricoes: dados.restricoes || '',
     extra: dados.extra || '',
   };
   await db
     .prepare(
-      'INSERT INTO rsvps (id, data_envio, nome, email, telefone, empresa, acompanhantes, restricoes, extra) VALUES (?,?,?,?,?,?,?,?,?)'
+      'INSERT INTO rsvps (id, data_envio, nome, email, telefone, acompanhantes, acompanhante_nome, acompanhante_telefone, restricoes, extra) VALUES (?,?,?,?,?,?,?,?,?,?)'
     )
     .bind(
       registro.id,
@@ -43,8 +45,9 @@ export async function adicionar(db, dados) {
       registro.nome,
       registro.email,
       registro.telefone,
-      registro.empresa,
       String(registro.acompanhantes),
+      registro.acompanhanteNome,
+      registro.acompanhanteTelefone,
       registro.restricoes,
       registro.extra
     )
@@ -58,7 +61,7 @@ export async function remover(db, id) {
 
 export async function paraCsv(db) {
   const lista = await listar(db);
-  const colunas = ['id', 'dataEnvio', 'nome', 'email', 'telefone', 'empresa', 'acompanhantes', 'restricoes', 'extra'];
+  const colunas = ['id', 'dataEnvio', 'nome', 'email', 'telefone', 'acompanhantes', 'acompanhanteNome', 'acompanhanteTelefone', 'restricoes', 'extra'];
   const linhas = [colunas.join(',')];
   for (const r of lista) {
     linhas.push(
