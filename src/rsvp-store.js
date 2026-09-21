@@ -59,6 +59,10 @@ export async function remover(db, id) {
   await db.prepare('DELETE FROM rsvps WHERE id = ?').bind(id).run();
 }
 
+export async function removerTodas(db) {
+  await db.prepare('DELETE FROM rsvps').run();
+}
+
 export async function paraCsv(db) {
   const lista = await listar(db);
   const colunas = ['id', 'dataEnvio', 'nome', 'email', 'telefone', 'acompanhantes', 'acompanhanteNome', 'acompanhanteTelefone', 'restricoes', 'extra'];

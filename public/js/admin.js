@@ -406,6 +406,19 @@
   }
   $('btn-atualizar-rsvps').addEventListener('click', carregarConfirmacoes);
 
+  $('btn-apagar-todas-rsvps').addEventListener('click', async () => {
+    const total = $('total-confirmacoes').textContent;
+    if (!confirm(`Isso vai apagar todas as ${total} confirmação(ões) recebida(s) — não tem como desfazer. Continuar?`)) return;
+    const btn = $('btn-apagar-todas-rsvps');
+    btn.disabled = true;
+    try {
+      await fetch('/api/admin/rsvps', { method: 'DELETE' });
+      await carregarConfirmacoes();
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   // ------------------------------------------------------------------
   // início — sem login, carrega direto
   // ------------------------------------------------------------------

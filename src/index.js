@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 
 import { loadConfig, saveConfig, resetConfig } from './config-store.js';
-import { listar, adicionar, remover, paraCsv } from './rsvp-store.js';
+import { listar, adicionar, remover, removerTodas, paraCsv } from './rsvp-store.js';
 import { CATEGORIAS, salvarUpload, lerUpload } from './upload.js';
 import { permitir } from './rate-limit.js';
 
@@ -95,6 +95,11 @@ app.delete('/api/admin/rsvps/:id', async (c) => {
   return c.json({ ok: true, total });
 });
 
+app.delete('/api/admin/rsvps', async (c) => {
+  await removerTodas(c.env.DB);
+  return c.json({ ok: true, total: 0 });
+});
+
 app.post('/api/admin/upload/:categoria', async (c) => {
   const categoria = c.req.param('categoria');
   if (!CATEGORIAS[categoria]) return c.json({ ok: false, erro: 'Categoria inválida.' }, 400);
@@ -122,11 +127,9 @@ app.post('/api/admin/upload/:categoria', async (c) => {
 // depois da primeira leitura do KV, porque o navegador faz VÁRIAS
 // requisições Range durante a reprodução (um pedaço a cada poucos
 // segundos de vídeo). Sem esse cache, cada uma dessas requisições iria
-// ler o KV de novo — e a latência do KV, somada muitas vezes, é o que
-// fazia o vídeo travar/engasgar no meio da reprodução. Esse cache em
-// memória funciona em qualquer domínio (diferente do Cache API da
-// Cloudflare, que só funciona com domínio próprio — por isso mantemos
-// os dois).
+// ler o KV de novo. Não usa o Cache API da Cloudflare (caches.default)
+// porque esse recurso não é garantido em domínios *.workers.dev — esse
+// cache em memória é mais simples e funciona em qualquer domínio.
 const cacheEmMemoria = new Map();
 
 app.get('/uploads/:pasta/:nome', async (c) => {
@@ -134,26 +137,9 @@ app.get('/uploads/:pasta/:nome', async (c) => {
 
   let arquivo = cacheEmMemoria.get(caminho);
   if (!arquivo) {
-    const cache = caches.default;
-    const chaveCache = new Request(c.req.url, { method: 'GET' });
-    const emCacheBorda = await cache.match(chaveCache);
-    if (emCacheBorda) {
-      arquivo = { data: await emCacheBorda.arrayBuffer(), contentType: emCacheBorda.headers.get('Content-Type') };
-    } else {
-      const resultado = await lerUpload(c.env.KV, caminho);
-      if (!resultado) return c.notFound();
-      arquivo = resultado;
-      const respostaCompleta = new Response(arquivo.data, {
-        status: 200,
-        headers: {
-          'Content-Type': arquivo.contentType,
-          'Content-Length': String(arquivo.data.byteLength),
-          'Cache-Control': 'public, max-age=604800, immutable',
-          'Accept-Ranges': 'bytes',
-        },
-      });
-      c.executionCtx.waitUntil(cache.put(chaveCache, respostaCompleta));
-    }
+    const resultado = await lerUpload(c.env.KV, caminho);
+    if (!resultado) return c.notFound();
+    arquivo = resultado;
     cacheEmMemoria.set(caminho, arquivo);
     // limite simples pra não deixar a memória do Worker crescer sem
     // controle se muitos arquivos diferentes forem pedidos na mesma
