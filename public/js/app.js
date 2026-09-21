@@ -294,18 +294,27 @@
 
   // Mostra/oculta e alterna "required" nos campos de nome/telefone do
   // acompanhante, conforme a quantidade selecionada (só captura os dados
-  // quando pelo menos 1 acompanhante for escolhido).
+  // quando pelo menos 1 acompanhante for escolhido) e se o telefone do
+  // acompanhante está ativo nas configurações.
   function atualizarCamposAcompanhante() {
     const select = $('campo-acompanhantes');
     const linha = $('linha-acompanhante-dados');
     const nomeCampo = $('campo-acompanhante-nome');
+    const grupoTelefone = $('grupo-acompanhante-telefone');
     const telCampo = $('campo-acompanhante-telefone');
     if (!select || !linha) return;
     const mostrar = parseInt(select.value, 10) > 0;
+    const acompCfg = (CFG.formulario && CFG.formulario.campos && CFG.formulario.campos.acompanhantes) || {};
+    const telefoneAtivo = acompCfg.telefoneAtivo !== false;
+
     linha.classList.toggle('oculto', !mostrar);
     if (nomeCampo) nomeCampo.required = mostrar;
-    if (telCampo) telCampo.required = mostrar;
-    if (!mostrar) { if (nomeCampo) nomeCampo.value = ''; if (telCampo) telCampo.value = ''; }
+
+    grupoTelefone && grupoTelefone.classList.toggle('oculto', !telefoneAtivo);
+    linha.classList.toggle('uma-coluna', !telefoneAtivo);
+    if (telCampo) telCampo.required = mostrar && telefoneAtivo;
+    if (!mostrar || !telefoneAtivo) { if (telCampo) telCampo.value = ''; }
+    if (!mostrar) { if (nomeCampo) nomeCampo.value = ''; }
   }
 
   function aplicarCampo(grupoId, campoId, cfgCampo) {

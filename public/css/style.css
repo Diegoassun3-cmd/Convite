@@ -318,6 +318,7 @@ html { overflow-x: hidden; }
 .campo input::placeholder, .campo textarea::placeholder { color: #b4ac9c; }
 
 .linha-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.linha-form.uma-coluna { grid-template-columns: 1fr; }
 .acoes-form { margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
 
 /* ============================== CONFIRMAÇÃO ================================ */

@@ -90,10 +90,10 @@ export default {
     campos: {
       email: { ativo: true, obrigatorio: true },
       telefone: { ativo: true, obrigatorio: false },
-      // maximo: 1 captura nome e telefone do acompanhante automaticamente
-      // (só funciona para 1 acompanhante — acima disso, só a quantidade é
-      // registrada, sem os dados individuais de cada um).
-      acompanhantes: { ativo: true, obrigatorio: true, maximo: 1 },
+      // maximo: 1 captura nome (e telefone, se ativo) do acompanhante
+      // automaticamente (só funciona para 1 acompanhante — acima disso, só
+      // a quantidade é registrada, sem os dados individuais de cada um).
+      acompanhantes: { ativo: true, obrigatorio: true, maximo: 1, telefoneAtivo: true },
       restricoesAlimentares: { ativo: true, obrigatorio: false },
       perguntaExtra: { ativo: false, label: "", placeholder: "", obrigatorio: false },
     },

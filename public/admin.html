@@ -284,12 +284,16 @@
           <div class="linha-toggle"><div class="txt"><strong>Restrições alimentares</strong></div><div style="display:flex;gap:18px;"><label><input type="checkbox" data-path="formulario.campos.restricoesAlimentares.ativo"> Ativo</label><label><input type="checkbox" data-path="formulario.campos.restricoesAlimentares.obrigatorio"> Obrigatório</label></div></div>
 
           <div class="linha-toggle">
-            <div class="txt"><strong>Acompanhante</strong><span>Ao selecionar +1, o convidado também informa o nome e telefone do acompanhante</span></div>
+            <div class="txt"><strong>Acompanhante</strong><span>Ao selecionar +1, o convidado também informa o nome (e telefone, se ativo) do acompanhante</span></div>
             <div style="display:flex;gap:18px;align-items:center;">
               <label><input type="checkbox" data-path="formulario.campos.acompanhantes.ativo"> Ativo</label>
               <label><input type="checkbox" data-path="formulario.campos.acompanhantes.obrigatorio"> Obrigatório</label>
               <label>Máximo <input type="number" min="0" max="20" style="width:60px;" data-path="formulario.campos.acompanhantes.maximo"></label>
             </div>
+          </div>
+          <div class="linha-toggle">
+            <div class="txt"><strong>Telefone do acompanhante</strong><span>Desative se quiser pedir só o nome do acompanhante</span></div>
+            <input type="checkbox" class="chave" data-path="formulario.campos.acompanhantes.telefoneAtivo">
           </div>
 
           <div class="linha-toggle">
