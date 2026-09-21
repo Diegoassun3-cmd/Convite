@@ -382,6 +382,7 @@
           <td>${escapar(r.nome)}</td>
           <td>${escapar(r.email || '-')}</td>
           <td>${escapar(r.telefone || '-')}</td>
+          <td>${escapar(r.socio || '-')}</td>
           <td>${escapar(String(acomp))}</td>
           <td>${escapar(dadosAcomp)}</td>
           <td>${escapar(r.restricoes || '-')}</td>

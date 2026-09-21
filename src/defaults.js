@@ -90,6 +90,7 @@ export default {
     campos: {
       email: { ativo: true, obrigatorio: true },
       telefone: { ativo: true, obrigatorio: false },
+      socio: { ativo: true, obrigatorio: false },
       // maximo: 1 captura nome (e telefone, se ativo) do acompanhante
       // automaticamente (só funciona para 1 acompanhante — acima disso, só
       // a quantidade é registrada, sem os dados individuais de cada um).

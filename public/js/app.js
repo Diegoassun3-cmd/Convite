@@ -260,6 +260,7 @@
 
     aplicarCampo('grupo-email', 'campo-email', config('email'));
     aplicarCampo('grupo-telefone', 'campo-telefone', config('telefone'));
+    aplicarCampo('grupo-socio', 'campo-socio', config('socio'));
     aplicarCampo('grupo-restricoes', 'campo-restricoes', config('restricoesAlimentares'));
 
     const acompCfg = config('acompanhantes');
@@ -350,6 +351,7 @@
       nome: form.nome.value.trim(),
       email: form.email ? form.email.value.trim() : '',
       telefone: form.telefone ? form.telefone.value.trim() : '',
+      socio: form.socio ? form.socio.value : '',
       acompanhantes: form.acompanhantes ? form.acompanhantes.value : '',
       acompanhanteNome: form.acompanhanteNome ? form.acompanhanteNome.value.trim() : '',
       acompanhanteTelefone: form.acompanhanteTelefone ? form.acompanhanteTelefone.value.trim() : '',

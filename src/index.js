@@ -43,6 +43,7 @@ app.post('/api/rsvp', async (c) => {
     nome,
     email: String(b.email || '').trim().slice(0, 200),
     telefone: String(b.telefone || '').trim().slice(0, 60),
+    socio: String(b.socio || '').trim().slice(0, 40),
     acompanhantes: String(b.acompanhantes ?? '').slice(0, 10),
     acompanhanteNome: String(b.acompanhanteNome || '').trim().slice(0, 200),
     acompanhanteTelefone: String(b.acompanhanteTelefone || '').trim().slice(0, 60),
