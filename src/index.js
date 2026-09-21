@@ -114,43 +114,71 @@ app.post('/api/admin/upload/:categoria', async (c) => {
 // ---------------------------------------------------------------------
 // Vídeos precisam de suporte a "Range" (bytes parciais) — sem isso, o
 // navegador só consegue começar a tocar depois de baixar o arquivo
-// inteiro (por isso a demora de dezenas de segundos antes de o vídeo
-// aparecer). Com Range, ele consegue buscar só o pedaço inicial (e o
+// inteiro. Com Range, ele consegue buscar só o pedaço inicial (e o
 // índice de metadados do vídeo, geralmente no fim do arquivo) e já
-// começa a reproduzir. Também cacheia na borda da Cloudflare, para que
-// visitas seguintes nem precisem buscar de novo no KV.
+// começa a reproduzir — e continua pedindo pedaços conforme avança.
+//
+// Guarda o arquivo em memória (dentro da própria instância do Worker)
+// depois da primeira leitura do KV, porque o navegador faz VÁRIAS
+// requisições Range durante a reprodução (um pedaço a cada poucos
+// segundos de vídeo). Sem esse cache, cada uma dessas requisições iria
+// ler o KV de novo — e a latência do KV, somada muitas vezes, é o que
+// fazia o vídeo travar/engasgar no meio da reprodução. Esse cache em
+// memória funciona em qualquer domínio (diferente do Cache API da
+// Cloudflare, que só funciona com domínio próprio — por isso mantemos
+// os dois).
+const cacheEmMemoria = new Map();
+
 app.get('/uploads/:pasta/:nome', async (c) => {
-  const cache = caches.default;
-  const chaveCache = new Request(c.req.url, { method: 'GET' });
+  const caminho = `${c.req.param('pasta')}/${c.req.param('nome')}`;
 
-  const emCache = await cache.match(chaveCache);
-  if (emCache) return respostaComRange(emCache, c.req.header('Range'));
+  let arquivo = cacheEmMemoria.get(caminho);
+  if (!arquivo) {
+    const cache = caches.default;
+    const chaveCache = new Request(c.req.url, { method: 'GET' });
+    const emCacheBorda = await cache.match(chaveCache);
+    if (emCacheBorda) {
+      arquivo = { data: await emCacheBorda.arrayBuffer(), contentType: emCacheBorda.headers.get('Content-Type') };
+    } else {
+      const resultado = await lerUpload(c.env.KV, caminho);
+      if (!resultado) return c.notFound();
+      arquivo = resultado;
+      const respostaCompleta = new Response(arquivo.data, {
+        status: 200,
+        headers: {
+          'Content-Type': arquivo.contentType,
+          'Content-Length': String(arquivo.data.byteLength),
+          'Cache-Control': 'public, max-age=604800, immutable',
+          'Accept-Ranges': 'bytes',
+        },
+      });
+      c.executionCtx.waitUntil(cache.put(chaveCache, respostaCompleta));
+    }
+    cacheEmMemoria.set(caminho, arquivo);
+    // limite simples pra não deixar a memória do Worker crescer sem
+    // controle se muitos arquivos diferentes forem pedidos na mesma
+    // instância — descarta o mais antigo quando passa de 6.
+    if (cacheEmMemoria.size > 6) cacheEmMemoria.delete(cacheEmMemoria.keys().next().value);
+  }
 
-  const resultado = await lerUpload(c.env.KV, `${c.req.param('pasta')}/${c.req.param('nome')}`);
-  if (!resultado) return c.notFound();
-
-  const respostaCompleta = new Response(resultado.data, {
-    status: 200,
-    headers: {
-      'Content-Type': resultado.contentType,
-      'Content-Length': String(resultado.data.byteLength),
-      'Cache-Control': 'public, max-age=604800, immutable',
-      'Accept-Ranges': 'bytes',
-    },
-  });
-  c.executionCtx.waitUntil(cache.put(chaveCache, respostaCompleta.clone()));
-
-  return respostaComRange(respostaCompleta, c.req.header('Range'));
+  return respostaComRange(arquivo, c.req.header('Range'));
 });
 
-/** Recorta a resposta completa conforme o cabeçalho Range, se houver. */
-async function respostaComRange(resposta, rangeHeader) {
-  if (!rangeHeader) return resposta;
+/** Monta a resposta (inteira ou recortada conforme o Range) a partir do arquivo em memória. */
+function respostaComRange(arquivo, rangeHeader) {
+  const tamanhoTotal = arquivo.data.byteLength;
+  const cabecalhosComuns = {
+    'Content-Type': arquivo.contentType || 'application/octet-stream',
+    'Cache-Control': 'public, max-age=604800, immutable',
+    'Accept-Ranges': 'bytes',
+  };
 
-  const buffer = await resposta.clone().arrayBuffer();
-  const tamanhoTotal = buffer.byteLength;
+  if (!rangeHeader) {
+    return new Response(arquivo.data, { status: 200, headers: { ...cabecalhosComuns, 'Content-Length': String(tamanhoTotal) } });
+  }
+
   const match = /bytes=(\d*)-(\d*)/.exec(rangeHeader);
-  if (!match) return resposta;
+  if (!match) return new Response(arquivo.data, { status: 200, headers: { ...cabecalhosComuns, 'Content-Length': String(tamanhoTotal) } });
 
   let inicio, fim;
   if (match[1] === '') {
@@ -158,7 +186,7 @@ async function respostaComRange(resposta, rangeHeader) {
     // assim que o navegador busca o índice/metadados do vídeo, que em
     // muitos MP4s fica no final do arquivo.
     const sufixo = parseInt(match[2], 10);
-    if (isNaN(sufixo) || sufixo <= 0) return resposta;
+    if (isNaN(sufixo) || sufixo <= 0) return new Response(arquivo.data, { status: 200, headers: { ...cabecalhosComuns, 'Content-Length': String(tamanhoTotal) } });
     inicio = Math.max(0, tamanhoTotal - sufixo);
     fim = tamanhoTotal - 1;
   } else {
@@ -171,16 +199,10 @@ async function respostaComRange(resposta, rangeHeader) {
     return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${tamanhoTotal}` } });
   }
 
-  const fatia = buffer.slice(inicio, fim + 1);
+  const fatia = arquivo.data.slice(inicio, fim + 1);
   return new Response(fatia, {
     status: 206,
-    headers: {
-      'Content-Type': resposta.headers.get('Content-Type') || 'application/octet-stream',
-      'Content-Range': `bytes ${inicio}-${fim}/${tamanhoTotal}`,
-      'Content-Length': String(fatia.byteLength),
-      'Cache-Control': 'public, max-age=604800, immutable',
-      'Accept-Ranges': 'bytes',
-    },
+    headers: { ...cabecalhosComuns, 'Content-Range': `bytes ${inicio}-${fim}/${tamanhoTotal}`, 'Content-Length': String(fatia.byteLength) },
   });
 }
 
