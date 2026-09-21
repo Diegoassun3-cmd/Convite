@@ -129,7 +129,7 @@
     if ($('txt-local-nome')) $('txt-local-nome').textContent = (ev.local && ev.local.nome) || '';
     if ($('txt-local-endereco')) $('txt-local-endereco').textContent = (ev.local && ev.local.endereco) || '';
 
-    if (ev.trajes && ev.trajes.texto) {
+    if (ev.trajes && ev.trajes.ativo !== false && ev.trajes.texto) {
       $('bloco-trajes') && $('bloco-trajes').classList.remove('oculto');
       $('txt-traje') && ($('txt-traje').textContent = ev.trajes.texto);
       const btnTraje = $('link-traje-btn');
@@ -404,7 +404,7 @@
     }
     const linkTrajes = $('link-trajes');
     if (linkTrajes) {
-      if (ev.trajes && ev.trajes.link) linkTrajes.href = ev.trajes.link;
+      if (ev.trajes && ev.trajes.ativo !== false && ev.trajes.link) linkTrajes.href = ev.trajes.link;
       else linkTrajes.classList.add('oculto');
     }
 

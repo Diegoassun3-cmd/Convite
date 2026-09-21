@@ -22,7 +22,7 @@ export default {
       endereco: "Av. das Nações Unidas, 1234 – São Paulo, SP",
       mapaUrl: "https://maps.google.com/?q=Espaço+Villa+Bisutti+São+Paulo",
     },
-    trajes: { texto: "Esporte fino", link: "" },
+    trajes: { ativo: true, texto: "Esporte fino", link: "" },
     avisoExtra: { ativo: false, titulo: "Observação", texto: "" },
   },
 
