@@ -56,10 +56,25 @@
 
     if (!f.ativo || !f.videoUrl) { container.innerHTML = ''; return; }
 
-    container.innerHTML = `<video autoplay ${f.videoLoop === false ? '' : 'loop'} playsinline preload="auto" ${f.videoMudo === false ? '' : 'muted'} src="${escaparHtml(f.videoUrl)}"></video><div class="fundo-overlay"></div>`;
+    container.innerHTML = `<video autoplay ${f.videoLoop === false ? '' : 'loop'} playsinline webkit-playsinline preload="auto" ${f.videoMudo === false ? '' : 'muted'} src="${escaparHtml(f.videoUrl)}"></video><div class="fundo-overlay"></div>`;
     const video = container.querySelector('video');
     if (video) {
-      video.play().catch(() => {});
+      const tentarTocar = () => video.play().catch(() => {});
+      tentarTocar();
+      // Alguns navegadores embutidos (ex.: o navegador interno do WhatsApp
+      // ou do Instagram) bloqueiam o autoplay mesmo com muted+playsinline,
+      // deixando o vídeo "congelado" no primeiro frame como se fosse uma
+      // foto. Assim que o usuário interage com a página (toque, clique ou
+      // rolagem) isso conta como gesto do usuário e libera a reprodução.
+      const tentarNaInteracao = () => { if (video.paused) tentarTocar(); };
+      ['touchstart', 'click', 'scroll'].forEach((ev) =>
+        document.addEventListener(ev, tentarNaInteracao, { once: true, passive: true })
+      );
+      // Se o navegador pausar o vídeo sozinho (economia de energia, troca de
+      // aba), tenta retomar quando a página volta a ficar visível.
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && video.paused) tentarTocar();
+      });
       // só revela o vídeo (fade-in) quando já tem um frame pronto pra mostrar —
       // evita a sensação de "demora" de um vídeo preto/travado aparecendo.
       if (video.readyState >= 2) container.classList.add('ativo');
@@ -183,7 +198,15 @@
 
       const video = $('midia-video');
       const btnSom = $('btn-midia-som');
-      if (video && m.videoAutoplay) video.play().catch(() => {});
+      if (video && m.videoAutoplay) {
+        video.play().catch(() => {});
+        // mesma proteção do vídeo de fundo: retenta a reprodução no primeiro
+        // toque/clique, caso o navegador tenha bloqueado o autoplay inicial.
+        const tentarNaInteracao = () => { if (video.paused) video.play().catch(() => {}); };
+        ['touchstart', 'click', 'scroll'].forEach((ev) =>
+          document.addEventListener(ev, tentarNaInteracao, { once: true, passive: true })
+        );
+      }
       if (btnSom && video) {
         btnSom.addEventListener('click', () => {
           video.muted = !video.muted;
